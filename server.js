@@ -28,6 +28,7 @@ server.listen(port, function() {
 
 var players = {};
 io.on('connection', function(socket) {
+	socket.emit('connected', {message: 'Hi!'})
 	socket.on('new player', function() {
 	    console.log("Server. New player");
 	});
