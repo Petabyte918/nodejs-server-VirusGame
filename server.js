@@ -17,79 +17,8 @@ var USERS_COLLECTION = "users";
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
 
-//Connect to the database before starting the application server
-console.log("process.env.MONGOLAB_SILVER_URI: "+process.env.MONGOLAB_SILVER_URI);
-mongodb.MongoClient.connect(process.env.MONGOLAB_SILVER_URI, function (err, database) {
-	if (err) {
-		console.log(err);
-		process.exit(1);
-	}
 
-	//Save database object from the callback for reuse.
-	db = database;
-	console.log("Database connection ready");
-
-/** RESTful API server with Nose.js
-
-EndPoints we need:
-
-/api/contacts
-Method	Description
-GET 	Find all contacts
-POST 	Create a new contact
-
-/api/contacts/:id
-Method	Description
-GET 	Find a single contact by ID
-PUT 	Update entire contact document
-DELETE 	Dele a contact by ID
-
-**/
-/**
-// Generic error handler used by all endpoints.
-function handleError(res, reason, message, code) {
-	console.log("ERROR: "+reason);
-	res.status(code || 500).json({
-		"error": message
-	});
-}**/
-
-/*  "/api/contacts"
- *    GET: finds all contacts
- *    POST: creates a new contact
- */
-/**
-app.get("/api/contacts", function(req, res) {
-});
-
-app.post("/api/contacts", function(req, res) {
-});**/
-
-/*  "/api/contacts/:id"
- *    GET: find contact by id
- *    PUT: update contact by id
- *    DELETE: deletes contact by id
- */
-/**
-app.get("/api/contacts/:id", function(req, res) {
-});
-
-app.put("/api/contacts/:id", function(req, res) {
-});
-
-app.delete("/api/contacts/:id", function(req, res) {
-});**/
-
-	// Starts the server.
-  	var server = app.listen(process.env.PORT || 8080, function () {
-    	var port = server.address().port;
-    	console.log('Starting server');
-    	console.log("App now running on port", port);
-  	});
-
-});
-
-/** Antiguo arranque servidor
+// Antiguo arranque servidor
 var port = process.env.PORT || 5000;
 
 // Starts the server.
@@ -97,7 +26,7 @@ server.listen(port, function() {
 //server.listen(5000, function() {
   console.log('Starting server');
 });
-**/
+
 
 /** END MONGO DATABASE **/
 
