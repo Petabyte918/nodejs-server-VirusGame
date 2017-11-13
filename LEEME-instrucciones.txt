@@ -1,0 +1,25 @@
+---
+HEROKU
+
+
+---
+mLab MongoDB
+https://dashboard.heroku.com/apps/nodejs-server-virusgame/resources?justInstalledAddonServiceId=3dfb031f-23f4-4123-856f-5cb95ecdadc9
+
+
+---
+MONGO DATABASE - https://devcenter.heroku.com/articles/mongolab
+Use the heroku config command to view your app’s config variables.
+	$ heroku config:get MONGODB_URI
+	MONGODB_URI => mongodb://heroku_12345678:random_password@ds029017.mLab.com:29017/heroku_12345678
+
+Accessing the management portal via Heroku
+	To access the mLab management portal:
+	Log in to Heroku
+	Select your app
+	Under the “Add-ons” section, click your mLab add-on
+
+	Alternatively, you can use the heroku command:
+	$ heroku addons:open mongolab
+
+

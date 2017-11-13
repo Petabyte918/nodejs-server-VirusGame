@@ -1,11 +1,12 @@
 // Dependencies
 var express = require('express');
+var bodyParser = require("body-parser");
 var http = require('http');
-//var path = require('path');
 var socketIO = require('socket.io');
 var mongodb = require("mongodb");
 
-//var app = express();
+var app = express();
+app.use(bodyParser.json());
 var server = http.Server(app);
 var io = require('socket.io').listen(server);
 var ObjectID = mongodb.ObjectID;
@@ -17,16 +18,16 @@ var USERS_COLLECTION = "users";
 var db;
 
 //Connect to the database before starting the application server
-mongodb.MongoClient.connect(process.env.MONGODB_URI, function (err, database) {
+console.log("process.env.MONGOLAB_SILVER_URI: "+process.env.MONGOLAB_SILVER_URI);
+mongodb.MongoClient.connect(process.env.MONGOLAB_SILVER_URI, function (err, database) {
 	if (err) {
 		console.log(err);
 		process.exit(1);
 	}
-});
 
-//Save database object from the callback for reuse.
-db = database;
-console.log("Database connection ready");
+	//Save database object from the callback for reuse.
+	db = database;
+	console.log("Database connection ready");
 
 /** RESTful API server with Nose.js
 
@@ -44,32 +45,32 @@ PUT 	Update entire contact document
 DELETE 	Dele a contact by ID
 
 **/
-
+/**
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
 	console.log("ERROR: "+reason);
 	res.status(code || 500).json({
 		"error": message
 	});
-}
+}**/
 
 /*  "/api/contacts"
  *    GET: finds all contacts
  *    POST: creates a new contact
  */
-
+/**
 app.get("/api/contacts", function(req, res) {
 });
 
 app.post("/api/contacts", function(req, res) {
-});
+});**/
 
 /*  "/api/contacts/:id"
  *    GET: find contact by id
  *    PUT: update contact by id
  *    DELETE: deletes contact by id
  */
-
+/**
 app.get("/api/contacts/:id", function(req, res) {
 });
 
@@ -77,33 +78,35 @@ app.put("/api/contacts/:id", function(req, res) {
 });
 
 app.delete("/api/contacts/:id", function(req, res) {
+});**/
+
+	// Starts the server.
+  	var server = app.listen(process.env.PORT || 8080, function () {
+    	var port = server.address().port;
+    	console.log('Starting server');
+    	console.log("App now running on port", port);
+  	});
+
 });
 
-/** END MONGO DATABASE **/
-
+/** Antiguo arranque servidor
 var port = process.env.PORT || 5000;
-//No estamos usando express
-//app.set('port', 5000);
-//app.use('/static', express.static(__dirname + '/static'));
-
-// Routing
-//app.get('/', function(request, response) {
-  //response.sendFile(path.join(__dirname+"/static/", 'index.html'));
-//});
 
 // Starts the server.
 server.listen(port, function() {
 //server.listen(5000, function() {
   console.log('Starting server');
 });
+**/
+
+/** END MONGO DATABASE **/
 
 
+/** Gestion de interfaz de usuario **/
 var players = [];
 var partidas = {};
 var estadoPartidas = {};
 var deckOfCards = [];
-
-/** Gestion de interfaz de usuario **/
 
 //Establecemos un tiempo de que cada X borre todas las partidas vacias (50min y cambiara a 5min)
 setInterval(function(){
@@ -443,34 +446,34 @@ card.prototype.toString = function () {
 
 function initDeckOfCards(){
 	for (var i = 0; i < 5; i++) {
-		deckOfCards.push(new card(cardType.organo, 'hueso', 'img/orgaImages/organos/orgaHueso.png'));
-		deckOfCards.push(new card(cardType.organo, 'corazon', 'img/orgaImages/organos/orgaCorazon.png'));
-		deckOfCards.push(new card(cardType.organo, 'higado', 'img/orgaImages/organos/orgaHigado.png'));
-		deckOfCards.push(new card(cardType.organo, 'cerebro', 'img/orgaImages/organos/orgaCerebro.png'));
+		deckOfCards.push(new card(cardType.organo, 'hueso', 'img/cardImagesLQ/organos/orgaHueso.png'));
+		deckOfCards.push(new card(cardType.organo, 'corazon', 'img/cardImagesLQ/organos/orgaCorazon.png'));
+		deckOfCards.push(new card(cardType.organo, 'higado', 'img/cardImagesLQ/organos/orgaHigado.png'));
+		deckOfCards.push(new card(cardType.organo, 'cerebro', 'img/cardImagesLQ/organos/orgaCerebro.png'));
 	}
 	for (var i = 0; i < 5; i++) {
-		deckOfCards.push(new card(cardType.medicina, 'hueso', 'img/medImages/medicina/medHueso.png'));
-		deckOfCards.push(new card(cardType.medicina, 'corazon', 'img/medImages/medicina/medCorazon.png'));
-		deckOfCards.push(new card(cardType.medicina, 'higado', 'img/medImages/medicina/medHigado.png'));
-		deckOfCards.push(new card(cardType.medicina, 'cerebro', 'img/medImages/medicina/medCerebro.png'));
+		deckOfCards.push(new card(cardType.medicina, 'hueso', 'img/cardImagesLQ/medicinas/medHueso.png'));
+		deckOfCards.push(new card(cardType.medicina, 'corazon', 'img/cardImagesLQ/medicinas/medCorazon.png'));
+		deckOfCards.push(new card(cardType.medicina, 'higado', 'img/cardImagesLQ/medicinas/medHigado.png'));
+		deckOfCards.push(new card(cardType.medicina, 'cerebro', 'img/cardImagesLQ/medicinas/medCerebro.png'));
 	}
 	for (var i = 0; i < 4; i++) {
-		deckOfCards.push(new card(cardType.virus, 'hueso', 'img/virusImages/virus/virusHueso.png'));
-		deckOfCards.push(new card(cardType.virus, 'corazon', 'img/virusImages/virus/virusCorazon.png'));
-		deckOfCards.push(new card(cardType.virus, 'higado', 'img/virusImages/virus/virusHigado.png'));
-		deckOfCards.push(new card(cardType.virus, 'cerebro', 'img/virusImages/virus/virusCerebro.png'));
+		deckOfCards.push(new card(cardType.virus, 'hueso', 'img/cardImagesLQ/virus/virusHueso.png'));
+		deckOfCards.push(new card(cardType.virus, 'corazon', 'img/cardImagesLQ/virus/virusCorazon.png'));
+		deckOfCards.push(new card(cardType.virus, 'higado', 'img/cardImagesLQ/virus/virusHigado.png'));
+		deckOfCards.push(new card(cardType.virus, 'cerebro', 'img/cardImagesLQ/virus/virusCerebro.png'));
 	}
 	for (var i = 0; i < 2; i++) {
-		deckOfCards.push(new card(cardType.tratamiento, 'error medico', 'img/cardImages/especiales/errorMedico.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImages/especiales/guanteDeLatex.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImages/especiales/transplante.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'ladron de organos', 'img/cardImages/especiales/ladronDeOrganos.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImages/especiales/contagio.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'error medico', 'img/cardImagesLQ/especiales/errorMedico.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImagesLQ/especiales/transplante.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'ladron de organos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
 	for (var i = 0; i < 1; i++) {
-		deckOfCards.push(new card(cardType.organo, 'comodin', 'img/cardImages/organos/orgaComodin.png'));
-		deckOfCards.push(new card(cardType.medicina, 'comodin', 'img/medImages/medicinas/medComodin.png'));
-		deckOfCards.push(new card(cardType.virus, 'comodin', 'img/cardImages/virus/virusComodin.png'));
+		deckOfCards.push(new card(cardType.organo, 'organoComodin', 'img/cardImagesLQ/organos/orgaComodin.png'));
+		deckOfCards.push(new card(cardType.medicina, 'comodin', 'img/cardImagesLQ/medicinas/medComodin.png'));
+		deckOfCards.push(new card(cardType.virus, 'comodin', 'img/cardImagesLQ/virus/virusComodin.png'));
 	}
 }
 initDeckOfCards();
