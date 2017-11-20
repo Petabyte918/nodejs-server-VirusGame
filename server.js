@@ -1,15 +1,12 @@
 // Dependencies
 var express = require('express');
-var bodyParser = require("body-parser");
 var http = require('http');
 var socketIO = require('socket.io');
 var mongodb = require("mongodb");
 
 var app = express();
-app.use(bodyParser.json());
 var server = http.Server(app);
 var io = require('socket.io').listen(server);
-var ObjectID = mongodb.ObjectID;
 
 /** BEGIN MONGO DATABASE **/
 var USERS_COLLECTION = "users";
@@ -17,16 +14,141 @@ var USERS_COLLECTION = "users";
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
 
+//Connect to the database before starting the application server
+var uri = "mongodb://heroku_5bwn5gbw:ur29uejlq3o50oeldbogs3oguc@ds259085.mlab.com:59085/heroku_5bwn5gbw";
+mongodb.MongoClient.connect(uri, function (err, database) {
+	if (err) {
+		console.log(err);
+		process.exit(1);
+	}
 
-// Antiguo arranque servidor
-var port = process.env.PORT || 5000;
+	//Save database object from the callback for reuse.
+	db = database;
+	console.log("Database connection ready");
 
-// Starts the server.
-server.listen(port, function() {
-//server.listen(5000, function() {
-  console.log('Starting server');
+	//Nuevo arranque del servidor
+  	/**var server = app.listen(process.env.PORT || 8080, function () {
+    	var port = server.address().port;
+    	console.log('Starting server');
+    	console.log("App now running on port", port);
+  	});**/
+
+  	//Antiguo arranque servidor
+	var port = process.env.PORT || 8080;
+
+	// Starts the server.
+	server.listen(port, function() {
+	//server.listen(5000, function() {
+	  console.log('Starting server');
+	  console.log("App now running on port", port);
+	});
+
 });
 
+/** semiRESTful API server with Nose.js **/
+
+/**
+EndPoints we need:
+
+/api/users
+Method	Description
+GET 	Find all users
+POST 	Create a new user
+
+/api/users/:id
+Method	Description
+GET 	Find a single user by ID
+PUT 	Update entire user document
+DELETE 	Dele a user by ID
+**/
+
+// Generic error handler used by all endpoints.
+function handleError(reason, message) {
+	console.log("ERROR: "+reason);
+	console.log("Error-message: "+message);
+}
+
+/**
+ *	"/api/users"
+ *    GET: finds all users
+ *    POST: creates a new user
+**/
+
+function getUsers_DB() {
+	db.collection(USERS_COLLECTION).find({}).toArray(function(err, doc) {
+	    if (err) {
+	      	handleError(err.message, "Failed to get users.");
+	      	return "";
+	    } else {
+	    	//Doc es un array de los diferentes usuarios y sus diferentes campos
+		    /**for (var i in doc) {
+		    	for (var elem in doc[i]){
+	    			console.log("Users got: doc[i]-elements-> "+doc[i]+"-"+elem);
+	    		}
+	    	}**/
+	    	return doc;
+	    }
+  	});
+}
+
+function postUser_DB(user) {
+	var newUser = user;
+	db.collection(USERS_COLLECTION).insertOne(newUser, function(err, doc) {
+	    if (err) {
+	        handleError(err.message, "Failed to create new user");
+	    } else {
+	    	//Doc contiene: result, connection, message, ops, insertedCount
+	    	//				insertedId, toJSON, toString
+	    	/**for (var elem in doc) {
+	    		console.log("User Added: "+elem);
+			}**/
+			console.log("User Added: "+doc.message);
+	    }
+	});
+}
+
+/**  
+ *	"/api/users/:id"
+ *    GET: find user by id
+ *    PUT: update user by id
+ *    DELETE: deletes user by id
+ **/
+
+function getUser_DB(id) {
+	db.collection(USERS_COLLECTION).findOne({ _id: id}, function(err, doc) {
+	    if (err) {
+	        handleError(err.message, "Failed to get a specific user");
+	    } else {
+	    	for (var elem in doc) {
+	    		console.log("User got: "+elem);
+	    	}
+	    }
+	});
+}
+
+function putUser_DB(id, user) {
+    db.collection(USERS_COLLECTION).updateOne({_id: id}, user, function(err, doc) {
+	    if (err) {
+	        handleError(err.message, "Failed to update contact");
+	    } else {
+	    	for (var elem in doc) {
+	    		console.log("User update: "+elem);
+	    	}
+	    }
+  	});
+}
+
+function deleteUser_DB(id) {
+	db.collection(USERS_COLLECTION).deleteOne({_id: id}, function(err, doc) {
+	    if (err) {
+	        handleError(err.message, "Failed to delete user");
+	    } else {
+	    	for (var elem in doc) {
+	    		console.log("User delete: "+elem);
+	    	}
+	    }
+	});
+}
 
 /** END MONGO DATABASE **/
 
@@ -277,11 +399,92 @@ io.on('connection', function(socket) {
 		}
 	});
 
-	socket.on('register_user', function(data) {
-		var usuario = data.usuario;
-		var pass = data.pass;
+	socket.on('login_user', function(data) {
+		//Comprobamos que el nombre de usuario no este ya usado
+	    db.collection(USERS_COLLECTION).find({usuario: data.usuario}).toArray(function(err, doc) {
+	    	/**console.log("login_user->find->err: "+err);
+	    	console.log("login_user->find->doc: "+doc);**/
+	    	var loginOk = false;
+	    	for (var i in doc) {
+	    		/**console.log("login_user->find->i: "+i);
+	    		console.log("login_user->find->doc[i]: "+doc[i]);**/
+	    		if (doc[i].pass == data.pass) {
+	    			loginOk = true;
+	    		}
+	    	}
+		    if (loginOk == true) {
+		      	console.log("login_user: El usuario esta registrado=>login ok");
+				socket.emit('login_user-OK', 'Usuario logueado');
+		    } else {
+		    	if (i >= 0) {
+		    		console.log("login_user: La contraseña del usuario "+data.usuario+" es erronea");
+					socket.emit('login_user-KO', 'La contraseña es erronea');
+		    	} else {
+			    	console.log("login_user: El usuario "+data.usuario+" no existe");
+					socket.emit('login_user-KO', 'Usuario no existe');
+				}
+		    }
+	  	});
 	});
 
+	socket.on('register_user', function(data) {
+		//Comprobamos que el nombre de usuario no este ya usado
+	    db.collection(USERS_COLLECTION).find({usuario: data.usuario}).toArray(function(err, doc) {
+	    	/**console.log("register_user->find->err: "+err);
+	    	console.log("register_user->find->doc: "+doc);
+	    	for (var i in doc) {
+	    		console.log("register_user->find->i: "+i);
+	    		console.log("register_user->find->doc[i]: "+doc[i]);
+	    	}**/
+		    if (doc == "") {
+		      	console.log("register_user: El usuario no esta repetido");
+				var newUser = {
+					"usuario": data.usuario,
+					"pass": data.pass,
+					"stats": {
+						"wins": 0,
+						"losts": 0,
+						"draws": 0,
+						"total": 0,
+						"retired": 0
+					}
+				};
+				db.collection(USERS_COLLECTION).insertOne(newUser, function(err, doc) {
+				    if (err) {
+				    	console.log("register_user->find->insertOne->err: "+err);
+				        socket.emit('register_user-KO', 'Usuario no repetido pero error al registrarlo');
+				    } else {
+						console.log("User Added: "+doc.message);
+						socket.emit('register_user-OK', 'Usuario registrado');
+				    }
+				});
+		    } else {
+		    	console.log("register_user: usuario repetido");
+				socket.emit('register_user-KO', 'Usuario repetido');
+		    }
+	  	});
+	});
+
+	socket.on('request_users', function(data) {
+		if (data.request == 'create_ranquing') {
+			db.collection(USERS_COLLECTION).find({}).toArray(function(err, doc) {
+				if (err) {
+				  	console.log("request_users->create_ranquing->find->err: "+err);
+				} else {
+					console.log("request_users->create_ranquing->OK");
+					//Copy second into first. Not sure if is a deep copy :-)
+					var cloneUsers = extend({}, doc);
+					for (var i in cloneUsers) {
+						//console.log("Var i is: "+i);
+						//Enviamos la lista de usuarios sin poner las contraseñas
+						delete cloneUsers[i].pass;
+						//console.log("cloneUsers[i].pass: "+cloneUsers[i].pass);
+					}
+					socket.emit('create_ranquing', cloneUsers);
+				}
+			});
+		}
+	});
 });
 
 /** Gestion de cada partida **/
@@ -356,6 +559,23 @@ function shuffle(array) {
   }
   return array;
 }
+
+
+//Use it for extend a object without Jquery. Return a object built merging second into first
+function extend(first, second) {
+    for (var secondProp in second) {
+        var secondVal = second[secondProp];
+        // Is this value an object?  If so, iterate over its properties, copying them over
+        if (secondVal && Object.prototype.toString.call(secondVal) === "[object Object]") {
+            first[secondProp] = first[secondProp] || {};
+            extend(first[secondProp], secondVal);
+        }
+        else {
+            first[secondProp] = secondVal;
+        }
+    }
+    return first;
+};
 /** -------------------- **/
 
 
