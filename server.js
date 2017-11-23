@@ -8,12 +8,7 @@ var app = express();
 var server = http.Server(app);
 var io = require('socket.io').listen(server);
 
-/** EXPRESS **/
-app.use("/", express.static(__dirname + '/static/index.html'));
-
-app.get('/cool', function(request, response) {
-  response.send(cool());
-});
+/** Express Sirviendo **/
 
 /** BEGIN MONGO DATABASE **/
 var USERS_COLLECTION = "users";
