@@ -1,18 +1,178 @@
-<html>
+<!DOCTYPE html>
+<html xmlns="http://w3.org/1999/xhtml">
 <head>
-  <title>A Multiplayer Game</title>
-  <style>
-    canvas {
-      width: 800px;
-      height: 600px;
-      border: 5px solid black;
-    }
-  </style>
-  <script src="/socket.io/socket.io.js"></script>
+	<title>TFG_VirusBoardGame</title>
+	<link href='http://fonts.googleapis.com/css?family=Oleo+Script' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="css/virusBoardGame.css" media="screen" />
+
+	<script src="Jquery/jquery-3.2.1.min.js"></script>
+	<script src="Modernizr/modernizr-customFull.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.4.0.js"></script>
+	<!--<script src="Socket.io.js/socket.io.js"></script>-->
+	<script src="js/engine.js"></script>
+	<script src="js/game.js"></script>
+	<script src="js/cliente.js"></script>
+
 </head>
 
-
 <body>
-   <canvas id="canvas"></canvas>
+	<div id="settings" onclick="button_settings()"></div>
+	<div id="ranquing" onclick="button_ranquing()"></div>
+	<div id="login" onclick="button_loginForm()">Iniciar Sesion</div>
+	<div id="leave" style="display: none;" onclick="button_leave()">Salir Sesión</div>
+	<div id="userNameContainer" style="display: none;"></div>
+	<div id="register" onclick="button_registerForm()">Registrar usuario</div>
+
+	<div id="loginForm" style="display: none;"/>
+		<form name="form_login_user" autocomplete="on" onsubmit="return form_login()"/>
+			<label class="label_form1 tittle_login">Logging usuario</label>
+			<label class="label_form1">Escribe tu nombre de usuario</label>
+			<input class="loginInputs" type="text" name="loginName" class="field-text" placeholder="Nombre de usuario"/>
+			<label class="label_form1">Escribe tu contraseña</label>
+			<input class="loginInputs" type="password" name="loginPass" class="field-text" placeholder="Escribe tu contraseña"/>
+			<input class="loginInputs bigButton" type="submit" value="Enviar" readonly="readonly"/>
+			<div id="loginCorrection" class="label_form1"></div>
+		</form>
+	</div>
+
+	<div id="registerForm" style="display: none;"/>
+		<form name="form_register_user" autocomplete="on" onsubmit="return form_register()"/>
+			<label class="label_form1 tittle_register">Registrando un nuevo usuario</label>
+			<label class="label_form1">Elige un nombre de usuario</label>
+			<input class="registerInputs" type="text" name="registerName" class="field-text" placeholder="Nombre de usuario"/>
+			<label class="label_form1">Escribe una contraseña</label>
+			<input class="registerInputs" type="password" name="registerPass1" class="field-text" placeholder="Escribe una contraseña"/>
+			<label class="label_form1">Repite la contraseña</label>
+			<input class="registerInputs" type="password" name="registerPass2" class="field-text" placeholder="Vuelve a introducir la contraseña"/>
+			<input class="registerInputs bigButton" type="submit" value="Enviar" readonly="readonly"/>
+			<div id="registerCorrection" class="label_form1"></div>
+		</form>
+	</div>
+
+	<div id="settingsForm" style="display: none;">
+		<form name="form_settings_user" onsubmit="return form_settings()"/>
+			<label class="label_form1 tittle_settings">Settings</label>
+			<label class="label_form1">Activar ayuda debil</label>
+			<label class="label_form1 switch">
+			  	<input type="checkbox" name="ayudaDebilName" checked>
+			  	<span class="slider round"></span>
+			</label>
+			<label class="label_form2">Ayuda sobre todo a usar las cartas especiales. Se recomiendo dejar activado</label>
+			<label class="label_form1">Activar ayuda fuerte</label>
+			<label class="label_form1 switch">
+			  	<input type="checkbox" name="ayudaFuerteName" checked>
+			  	<span class="slider round"></span>
+			</label>
+			<label class="label_form2">Consiste en cuadros de ayuda explicando el funcionamiento de la mayoria de las funcionalidades del juego</label>
+			<label class="label_form1">Recordar jugador</label>
+			<label class="label_form1 switch">
+			  	<input type="checkbox" name="autoLoginName" checked>
+			  	<span class="slider round"></span>
+			</label>
+			<input class="settingsInputs bigButton" type="submit" value="Guardar" readonly="readonly"/>
+		</form>
+	</div>
+
+	<div id="ranquingList" style="display: none;">
+	</div>
+
+	<div id="container_botones">
+		<a class="boton" id="boton_jugar" title="Jugar" onclick="joinPartida('','true')">Juego rápido</a>
+		<a class="boton" id="boton_crear" title="Crear Partida" onclick="button_create()">Crear Partida</a>
+		<a class="boton" id="boton_lista" title="Lista de partidas" onclick="button_lista_partidas()">Lista de partidas</a>
+	</div>
+
+	<div id="descartes_boton" style="display: none;">
+		<a class="boton" id="fin_descartes" title="fin_descarte" onclick="fin_descarte()">Fin Descarte</a>
+	</div>
+
+	<div id="container_form_create" style="display: none;">
+		<form name="form_create_game" id="form_create_game" onsubmit="return form_createGame()"/>
+			<ul class="form-style-1">
+			    <li class=li-marginTop>
+			    	<label class="label_form1">Escribe un nombre para tu partida<span class="required">*</span></label>
+			    	<input type="text" name="gameName" class="field-text" placeholder="Ej: partida de..."/>
+			    </li>
+			    <li class="li-marginTop">
+			        <label class="label_form1">Elige el numero de jugadores</label>
+			        <select name="gameNumPlayers" class="field-select">
+			        <option selected="true" value="2">2</option>
+			        <option value="3">3</option>
+			        <option value="4">4</option>
+			        <option value="5">5</option>
+			        <option value="6">6</option>
+			        </select>
+			    </li>
+			    <input class="boton" value="BACK" onclick="backTo_InitMenu() " readonly="readonly"/>
+			    <input class="boton botonCrearPartida" type="submit" value="Crear partida" readonly="readonly"/>
+			</ul>
+		</form>
+	</div>
+
+	<div id="lista_partidas" style="display: none;">
+		<input class="boton backBotonListaPartidas" value="BACK" onclick="backTo_InitMenu()" readonly="readonly"/>
+		
+		<ul id="container_partidas">
+			<!--<li class="partida">
+				<a class="nombre_partida">Nombre partida: nombre de la partida</a>
+				<a class="nombre_creador>"></a>
+				<a class="join_partida">ENTRAR</a>
+				<a class="leave_partida">SALIR</a>
+				<a class="num_jugadores">4 / 6</a>
+			</li>-->
+		</ul>
+	</div>
+
+	<div id="cuadroPartidaRapida" style="display: none;">
+		<a class="notaEncabezado">(Juega en la partida con más posibilidades de empezar antes)</a>
+		<a class="tituloCartaIzq">Actualmente:</a>
+		<a id="partidaRapidaNombre">-Partida: Partida de Perry maison</a>
+		<a id="partidaRapidaJugadores">-(Necesarios 2 jugadores)</a>
+	</div>
+
+	<div id=cuadroFinPartida style="display: none;">
+		<h1>Fin de la Partida</h1>
+		<h2>Ha ganado el jugador</br></h2>
+		<h3 id="jugadorFinPartida"></h3>
+		<input class="boton" id="botonFinPartida" value="VOLVER A LA PANTALLA PRINCIPAL" onclick="backTo_InitMenu()" readonly="readonly"/>
+	</div>
+
+	<div id="ayudaTransplante" style="display: none;" class=".ayudaDebil" onclick="ayudaTransplante()">
+		<div id="ayudaTransplanteParteSup">
+			<div class="iconoCartaEspecial">
+			</div>
+			<div class="textoCartaEspecial">
+				<a class="tituloTextoCartaEspecial">TRANSPLANTE<br></a>
+				<b>Intercambia</b> un órgano por otro entre dos jugadores cualesquiera. No importa si el color de estos órganos es diferente, ni si están sanos, infectados o vacunados. Sencillamente el jugador cambia el órgano escogido por otro, siempre y cuando ninguno de los dos jugadores tenga dos órganos del mismo color ni éstos estén inmunizados.
+			</div>
+		</div>
+		<div id="ayudaTransplanteParteInf">
+			<div class="cartaIzq">
+				<div class="tituloCartaIzq">Organo 1</div>
+				<div class="imagenCartaIzq"></div>
+			</div>
+			<div class="cartaDcha">
+				<div class="tituloCartaDcha">Organo 2</div>
+				<div class="imagenCartaDcha"></div>
+			</div>
+		</div>
+		<div id="ayudaTransplantePie">(Toca en un recuadro superior para eliminar la seleccion)</div>
+	</div>
+
+	<div id="canvas_container" style="position: relative; display: none;">
+		<canvas id="canvas" width="1000px" height="700px"
+				style="position: absolute; left: 0; top: 0; z-index: 5;">
+			Your browser does not support canvas
+		</canvas>
+		<canvas id="canvasMID" width="1000px" height="700px"
+				style="position: absolute; left: 0; top: 0; z-index: 4;">
+			Your browser does not support canvas
+		</canvas>
+		<canvas id="canvasBG" width="1000px" height="700px"
+				style="position: absolute; left: 0; top: 0; z-index: 3;">
+			Your browser does not support canvas
+		</canvas>
+	</div>
+
 </body>
 </html>

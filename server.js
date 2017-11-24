@@ -49,7 +49,15 @@ mongodb.MongoClient.connect(uri, function (err, database) {
 
 /** EXPRESS **/
 //Por defecto redirigimos el / path a index.html automaticamente
+var verbose = true;
 app.get('/', function(req, res) {
+    var file = req.params[0]; 
+
+    //For debugging, we can track what files are requested.
+    if(verbose) {
+    console.log('\t :: Express :: file requested (index) : ' + file);
+    }
+    //Send the requesting client the file.
 	res.sendFile(__dirname+'/public/index.html');
 });
 
@@ -58,9 +66,8 @@ app.get( '/*' , function( req, res, next ) {
     var file = req.params[0]; 
 
     //For debugging, we can track what files are requested.
-    var verbose = false;
     if(verbose) {
-    	console.log('\t :: Express :: file requested : ' + file);
+    	console.log('\t :: Express :: file requested (others) : ' + file);
     }
 
     //Send the requesting client the file.
