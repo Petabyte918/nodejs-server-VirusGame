@@ -47,6 +47,26 @@ mongodb.MongoClient.connect(uri, function (err, database) {
 
 });
 
+/** EXPRESS **/
+//Por defecto redirigimos el / path a index.html automaticamente
+app.get('/', function(req, res) {
+	res.sendFile(__dirname+'/public/index.html');
+});
+
+app.get( '/*' , function( req, res, next ) {
+    //Este es el archivo que se ha pedido
+    var file = req.params[0]; 
+
+    //For debugging, we can track what files are requested.
+    var verbose = false;
+    if(verbose) {
+    	console.log('\t :: Express :: file requested : ' + file);
+    }
+
+    //Send the requesting client the file.
+    res.sendFile( __dirname + '/public/' + file );
+});
+
 /** semiRESTful API server with Nose.js **/
 
 /**
@@ -156,7 +176,7 @@ function deleteUser_DB(id) {
 
 
 /** Gestion de interfaz de usuario **/
-var players = [];
+var playersSrv = {};
 var partidas = {};
 var estadoPartidas = {};
 var deckOfCards = [];
@@ -175,7 +195,12 @@ setInterval(function(){
 
 io.on('connection', function(socket) {
 	console.log("Nuevo cliente conectado. Id: "+socket.id);
-	players.push(socket.id);
+	var date = new Date();
+	playersSrv[socket.id] = {
+		nombre: "Anonimo",
+		fecha_primeraConexion: date,
+		fecha_ultimaPartida: date
+	};
 	//Parche-parchazo. El cliente se bloquea si mando mensajes justo cuando la conexion esta
 	//establecida/estableciendose -> preguntar a Jose
 	setTimeout(function(){
@@ -209,9 +234,16 @@ io.on('connection', function(socket) {
 			//console.log("gameName: "+gameName);
 			//console.log("gamePlayers: "+gamePlayers);
 			//console.log("gameNumPlayers: "+gameNumPlayers);
-			partidas[idPartida] = {idPartida: idPartida, gameName: gameName, 
-				gameNumPlayers: gameNumPlayers, gamePlayers: gamePlayers, estado: "esperando"};
+			partidas[idPartida] = {
+				idPartida: idPartida, 
+				gameName: gameName, 
+				gameNumPlayers: gameNumPlayers,
+				gamePlayers: gamePlayers, 
+				estado: "esperando"};
 			socket.emit('create_game-OK', {idPartida: idPartida});
+			//Mandamos un aviso a todos los jugadores para que actualicen su lista de partidas
+			//y el juego rapido
+			socket.broadcast.emit('new_game_available');
 		}
 	});
 
@@ -255,6 +287,9 @@ io.on('connection', function(socket) {
 				console.log("Jugador "+socket.id+" se ha unido a la partida "+idPartida);
 				partidas[idPartida].gamePlayers.push(socket.id);
 				socket.emit('join_game-OK', {idPartida: idPartida});
+				//Mandamos un aviso a todos los jugadores para que actualicen su lista de partidas
+				//y el juego rapido
+				socket.broadcast.emit('new_player_joined');
 				//Si la sala esta completa empezamos la partida
 				if (partidas[idPartida].gamePlayers.length == partidas[idPartida].gameNumPlayers) {
 					console.log("Partida "+idPartida+" va comenzar con los siguientes jugadores:");
@@ -289,6 +324,9 @@ io.on('connection', function(socket) {
 				partidas[data.idPartida].gamePlayers.splice(index, 1);
 				console.log("Jugador "+socket.id+" ha abandonado la partida "+data.idPartida);
 				socket.emit('leave_game-OK');
+				//Mandamos un aviso a todos los jugadores para que actualicen su lista de partidas
+				//y el juego rapido
+				io.sockets.emit('player_leaved');
 			} else {
 				console.log("Problema al eliminar jugador de partida");
 				socket.emit('leave_game-KO');
@@ -312,7 +350,9 @@ io.on('connection', function(socket) {
 	socket.on('siguienteTurnoSrv', function(datos_partida){
 		var idPartida = datos_partida.idPartida;
 		var jugadores = datos_partida.jugadores;
+		var infoJugadores = datos_partida.infoJugadores;
 		var turno =  datos_partida.turno;
+		var numTurno = datos_partida.numTurno + 1;
 		var deckOfCardsPartida = datos_partida.deckOfCardsPartida;
 		var organosJugadoresCli = datos_partida.organosJugadoresCli;
 		var movJugador = datos_partida.movJugador;
@@ -327,6 +367,18 @@ io.on('connection', function(socket) {
 			deckOfCardsPartida = shuffle(deckOfCards.slice());
 		}
 
+		//Comprobamos que a un jugador no se le haya pasado el turno X veces, si no se le echa
+		for (var idJugador in infoJugadores) {
+			if (infoJugadores[idJugador].turnosPerdidos >= infoJugadores[idJugador].limiteTurnosPerdidos) {
+				console.log("Se va a echar al jugador "+idJugador+" por haber estado inactivo "+infoJugadores[idJugador].limiteTurnosPerdidos+" veces");
+				//Lo elimino del array y por ende de los turnos
+				var posJug = jugadores.indexOf(idJugador);
+				jugadores.splice(posJug, 1);
+				//Lo elimino de infoJugadores
+				delete infoJugadores[idJugador];
+			}
+		}
+
 		//Avanzamos turno
 		var index = jugadores.indexOf(turno);
 		if (index < (jugadores.length -1)) {
@@ -339,7 +391,9 @@ io.on('connection', function(socket) {
 		var newDatos_partida = {
 			idPartida: idPartida,
 			jugadores: jugadores,
+			infoJugadores: infoJugadores,
 			turno: jugadores[index],
+			numTurno: numTurno,
 			deckOfCardsPartida: deckOfCardsPartida,
 			organosJugadoresCli: organosJugadoresCli,
 			movJugador: movJugador
@@ -349,22 +403,48 @@ io.on('connection', function(socket) {
 		//Enviamos la jugada a todos los participantes
 		//En un futuro usar rooms para los mensajes de broadcast. De momento lo hacemos a mano
 		var socket = "";
-		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
-			socketid = partidas[idPartida].gamePlayers[i];
+		//Por si llegan mensajes retrasados y la partida ya ha sido eliminada
+		if (partidas[idPartida] != undefined) {
+			for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
+				socketid = partidas[idPartida].gamePlayers[i];
 
-			io.to(socketid).emit('siguienteTurnoCli', newDatos_partida);
+				io.to(socketid).emit('siguienteTurnoCli', newDatos_partida);
+			}
 		}
 	});
 
+	socket.on('tiempo_agotado', function(data) {
+		console.log("Tiempo agotado en partida");
+		//Procesamos el turno perdido
+		var idPartida = data.idPartida;
+
+		//Protegemos servidor
+		if (partidas[idPartida] == undefined) {
+			console.log("Conexion peligrosa-->tiempo_agotado");
+			return
+		}
+		//Avisamos a los demas jugadores que pasen turno
+		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
+			socketid = partidas[idPartida].gamePlayers[i];
+			io.to(socketid).emit('tiempo_agotadoOK');
+		}
+	})
+
 	socket.on('terminarPartida', function(data){
+		console.log("Terminar partida");
 		var socket = "";
 		var idPartida = data.idPartida;
 		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
 			socketid = partidas[idPartida].gamePlayers[i];
 			io.to(socketid).emit('terminarPartida', data);
 		}
-		partidas[idPartida].gamePlayers = [];
-		partidas[idPartida].estado = "terminada";
+		//Actualizo la base de datos con el ganador y los jugadores
+
+		//Elimino la partida terminada
+		console.log("Partida terminada y eliminada");
+		delete partidas[idPartida];
+		//partidas[idPartida].gamePlayers = [];
+		//partidas[idPartida].estado = "terminada";
 	});
 
 	socket.on('checkMatchRunning', function(data){
@@ -416,6 +496,8 @@ io.on('connection', function(socket) {
 	    	}
 		    if (loginOk == true) {
 		      	console.log("login_user: El usuario esta registrado=>login ok");
+		      	//Guardamos el login con su socket
+		      	playersSrv[socket.id].nombre = data.usuario;
 				socket.emit('login_user-OK', 'Usuario logueado');
 		    } else {
 		    	if (i >= 0) {
@@ -501,7 +583,7 @@ function prepararPartida(idPartida) {
 
 	//En un futuro usar rooms para los mensajes de broadcast. De momento lo hacemos a mano
 	var socket = "";
-	for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
+	for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++) {
 		socketid = partidas[idPartida].gamePlayers[i];
 
 		var carta1 = takeCard(deckOfCardsPartida);
@@ -517,13 +599,24 @@ function prepararPartida(idPartida) {
 		};
 		io.to(socketid).emit('prepararPartida', datos_iniciales);
 	}
+	//Campo de informacion variada sobre los jugadores
+	var infoJugadores = {};
+	for (var i = 0; i < jugadores.length; i++) {
+		infoJugadores[jugadores[i]] = {turnosPerdidos: 0, 
+										nombre: playersSrv[jugadores[i]].nombre,
+										limiteTurnosPerdidos: 3,
+										turnoPerdida: 0
+									}
+	}
 
 	//Iniciamos los turnos
 	console.log("Server: iniciar turnos");
 	var newDatos_partida = {
 		idPartida: idPartida,
 		jugadores: jugadores,
+		infoJugadores: infoJugadores,
 		turno: jugadores[0],
+		numTurno: 1,
 		deckOfCardsPartida: deckOfCardsPartida,
 		organosJugadoresCli: undefined,
 		movJugador: ""
@@ -596,7 +689,7 @@ card.prototype.toString = function () {
 }
 
 function initDeckOfCards(){
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < 50; i++) {
 		deckOfCards.push(new card(cardType.organo, 'hueso', 'img/cardImagesLQ/organos/orgaHueso.png'));
 		deckOfCards.push(new card(cardType.organo, 'corazon', 'img/cardImagesLQ/organos/orgaCorazon.png'));
 		deckOfCards.push(new card(cardType.organo, 'higado', 'img/cardImagesLQ/organos/orgaHigado.png'));
@@ -614,12 +707,12 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.virus, 'higado', 'img/cardImagesLQ/virus/virusHigado.png'));
 		deckOfCards.push(new card(cardType.virus, 'cerebro', 'img/cardImagesLQ/virus/virusCerebro.png'));
 	}
-	for (var i = 0; i < 2; i++) {
+	for (var i = 0; i < 20; i++) {
 		deckOfCards.push(new card(cardType.tratamiento, 'error medico', 'img/cardImagesLQ/especiales/errorMedico.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
+		//deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
 		deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImagesLQ/especiales/transplante.png'));
 		deckOfCards.push(new card(cardType.tratamiento, 'ladron de organos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
+		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
 	for (var i = 0; i < 1; i++) {
 		deckOfCards.push(new card(cardType.organo, 'organoComodin', 'img/cardImagesLQ/organos/orgaComodin.png'));
