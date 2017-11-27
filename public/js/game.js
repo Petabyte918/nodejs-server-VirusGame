@@ -11,6 +11,7 @@ function playSound(soundResource){
 }
 
 var cv, cx, objetoActual, touch = null;
+var posInitObjX, posInitObjY = 0;
 var cvMID, cxMID = null;
 var cvBG, cxBG = null;
 var inicioX = 0, inicioY = 0;
@@ -488,6 +489,11 @@ function renderOrgano(posOrgano, estadoOrgano) {
 	}
 }
 
+
+//Ideas de mejora a futuro ->
+//1. Renderizar la imagen que se mueve y las otras a diferente ritmo -> DESCARTADA
+//2. Detectar la colision en el canvas de las cartas pero dibujar unicamente la que se mueve en otro sola
+//3. Tener las imagenes siempre cargadas y solo dibujarlas en el contexto. Y cuando robo cartas, cargarlas
 function actualizarCanvas(){
 	//console.log("Actualizar canvas");
 	cx.clearRect(0, 0, windowWidth, windowHeight);
@@ -544,7 +550,7 @@ function moveObjects(){
 	});
 
 	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-	    //console.log('Esto es un dispositivo móvil');
+	    console.log('Esto es un dispositivo móvil');
 		cv.ontouchstart = function(event) {
 			touch = event.touches[0];
 			for (var i = 0; i < objetos.length; i++) {
@@ -579,8 +585,7 @@ function moveObjects(){
 			objetoActual = null;
 		}
 	} else {
-		//console.log('Esto es un navegador de ordenador');
-		//Movil - ordenador
+		console.log('Esto es un navegador de ordenador');
 		cv.onmousedown = function(event) {
 			touch = event;
 			//console.log("Onmousedown");
@@ -589,10 +594,14 @@ function moveObjects(){
 				  && (objetos[i].width + objetos[i].x > touch.pageX)
 				  && objetos[i].y < touch.pageY
 				  && (objetos[i].height + objetos[i].y > touch.pageY)) {
+
 					objetoActual = objetos[i];
 					//console.log("Objeto "+i+" TOCADO");
 					inicioY = touch.pageY - objetos[i].y;
 					inicioX = touch.pageX - objetos[i].x;
+					//Optimizar renderizado
+					posInitObjX = objetoActual.x;
+					posInitObjY = objetoActual.y;
 					break;
 				}
 			}
@@ -606,11 +615,27 @@ function moveObjects(){
 			if (objetoActual != null) {
 				objetoActual.x = touch.pageX - inicioX;
 				objetoActual.y = touch.pageY - inicioY;
+
+				//Calculamos la distancia adecuado de renderizado segun diferencia de pixeles
+				//Podriamos hacer un producto escalar de x e y pero...pasando!
+				var distRend = 15;
+
+				if ( (((posInitObjX - objetoActual.x) > distRend) || 
+					((objetoActual.x - posInitObjX) > distRend)) ||
+					(((posInitObjY - objetoActual.y) > distRend) || 
+					((objetoActual.y - posInitObjY) > distRend)) ) {
+
+					posInitObjX = objetoActual.x;
+					posInitObjY = objetoActual.y;
+					actualizarCanvas();
+				}
+
+				//Objeto.x: dist x hasta el inicio de la carta
+				//Touch.x: punto x de la pagina donde tocas
+				//InicioX: distancia desde el limite izq de la carta al punto donde tocas (FIJO al arrastrar)
 				//console.log("ObjetoActual.x: "+objetoActual.x);
 				//console.log("touch.pageX: "+touch.pageX);
-				//console.log("touch.pageY: "+touch.pageY);
 				//console.log("inicioX :"+inicioX);
-				actualizarCanvas();
 			}
 		}
 

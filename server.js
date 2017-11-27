@@ -1,11 +1,20 @@
 // Dependencies
 var express = require('express');
 var http = require('http');
+var https = require('https');
+var fs = require('fs');
 var socketIO = require('socket.io');
 var mongodb = require("mongodb");
 
+var options = {
+  key: fs.readFileSync('./cert/key.pem'),
+  cert: fs.readFileSync('./cert/cert.pem'),
+  requestCert: true
+};
+
 var app = express();
-var server = http.Server(app);
+var server = https.createServer(options, app);
+//var server = http.Server(app);
 var io = require('socket.io').listen(server);
 
 /** Express Sirviendo **/
@@ -714,9 +723,9 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.virus, 'higado', 'img/cardImagesLQ/virus/virusHigado.png'));
 		deckOfCards.push(new card(cardType.virus, 'cerebro', 'img/cardImagesLQ/virus/virusCerebro.png'));
 	}
-	for (var i = 0; i < 20; i++) {
+	for (var i = 0; i < 50; i++) {
 		deckOfCards.push(new card(cardType.tratamiento, 'error medico', 'img/cardImagesLQ/especiales/errorMedico.png'));
-		//deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
 		deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImagesLQ/especiales/transplante.png'));
 		deckOfCards.push(new card(cardType.tratamiento, 'ladron de organos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
 		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));

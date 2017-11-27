@@ -86,6 +86,75 @@ function prepararOrganosJugadoresCli(){
 	}
 }
 
+function getUsersSorted (optionRanquing, data, maxLoop) {
+	//Para no cargarnos data
+	var auxData = $.extend(true,{},data);
+	var sortedObj = {};
+	var objIndex = 0;
+
+	if (optionRanquing == "wins") {
+		var topWin = -1;
+		var win = -1;
+		for (var cont = 0; cont < maxLoop; cont++) {
+			for (var i in auxData) {
+				win = auxData[i].stats.wins;
+				if (win > topWin) {
+					topWin = win;
+					objIndex = i;
+				}
+			}
+			var auxObj = $.extend(true,{},auxData[objIndex]);
+			delete auxData[objIndex];
+			sortedObj[cont] = auxObj;
+			topWin = -1;
+			win = -1;
+			objIndex = 0;
+		}
+	}
+
+	if (optionRanquing == "percent") {
+		var topPercent = -1;
+		var percent = -1;
+		for (var cont = 0; cont < maxLoop; cont++) {
+			for (var i in auxData) {
+				percent = auxData[i].stats.wins / auxData[i].stats.total;
+				if (percent > topPercent) {
+					topPercent = percent;
+					objIndex = i;
+				}
+			}
+			var auxObj = $.extend(true,{},auxData[objIndex]);
+			delete auxData[objIndex];
+			sortedObj[cont] = auxObj;
+			topWin = -1;
+			win = -1;
+			objIndex = 0;
+		}
+	}
+
+	if (optionRanquing == "total") {
+		var topTotal = -1;
+		var total = -1;
+		for (var cont = 0; cont < maxLoop; cont++) {
+			for (var i in auxData) {
+				total = auxData[i].stats.total;
+				if (total > topTotal) {
+					topTotal = total;
+					objIndex = i;
+				}
+			}
+			var auxObj = $.extend(true,{},auxData[objIndex]);
+			delete auxData[objIndex];
+			sortedObj[cont] = auxObj;
+			topTotal = -1;
+			total = -1;
+			objIndex = 0;
+		}
+	}
+
+	return sortedObj;
+}
+
 function gestionarMov(movJugador){
 
 }
