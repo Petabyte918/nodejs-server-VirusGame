@@ -6,15 +6,18 @@ var fs = require('fs');
 var socketIO = require('socket.io');
 var mongodb = require("mongodb");
 
-var options = {
+
+var app = express();
+
+/**var options = {
   key: fs.readFileSync('./cert/key.pem'),
   cert: fs.readFileSync('./cert/cert.pem'),
   requestCert: true
 };
 
-var app = express();
-var server = https.createServer(options, app);
-//var server = http.Server(app);
+
+var server = https.createServer(options, app);**/
+var server = http.Server(app);
 var io = require('socket.io').listen(server);
 
 /** Express Sirviendo **/
