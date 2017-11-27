@@ -6,9 +6,9 @@ var enPartidaEsperando = false;
 var ayudaFuerte;
 var ayudaDebil;
 /** Establecimiento de la conexion con el servidor **/
-//socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
+socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
 //Local
-var socket = io.connect('https://localhost:8080');
+//var socket = io.connect('https://localhost:8080');
 socket.on('Connection OK', function (data) {
    	console.log("Cliente conectado. Player_id: "+data.player_id);
    	usuario = data.player_id;
