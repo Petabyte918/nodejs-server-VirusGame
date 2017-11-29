@@ -100,7 +100,7 @@ POST 	Create a new user
 Method	Description
 GET 	Find a single user by ID
 PUT 	Update entire user document
-DELETE 	Dele a user by ID
+DELETE 	Delete a user by ID
 **/
 
 // Generic error handler used by all endpoints.
@@ -458,6 +458,38 @@ io.on('connection', function(socket) {
 			io.to(socketid).emit('terminarPartida', data);
 		}
 		//Actualizo la base de datos con el ganador y los jugadores
+		var stats = {};
+		var dbId;
+		var userName = "";
+		var usuario = "";
+		var pass = "";
+		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
+			socketid = partidas[idPartida].gamePlayers[i];
+			userName = data.infoJugadores[socketid].nombre;
+			console.log("Jugador: "+userName);
+			if (userName == "Anonimo") {
+				continue;
+			}
+			db.collection(USERS_COLLECTION).find({usuario: userName}).toArray(function(err, doc) {
+				
+				if (doc[0] != undefined) {
+					dbId = doc[0]._id;
+					console.log("id dbusuario: "+dbId);
+					usuario = doc[0].usuario;
+					pass = doc[0].pass;
+					stats.total = doc[0].stats.total + 1;
+					if (data.ganador == userName) {
+						stats.wins = doc[0].stats.wins + 1;
+					} else {
+						stats.wins = doc[0].stats.wins;
+					}
+
+					db.collection(USERS_COLLECTION).updateOne({_id: dbId}, {usuario: usuario, pass: pass, stats: stats}, function(err, doc) {
+						console.log("Partida terminadas. Datos de "+socketid+"actualizados");
+					});
+				}
+			});
+		}
 
 		//Elimino la partida terminada
 		console.log("Partida terminada y eliminada");
