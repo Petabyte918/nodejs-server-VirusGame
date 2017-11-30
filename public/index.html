@@ -144,7 +144,13 @@
 		<input class="boton" id="botonFinPartida" value="VOLVER A LA PANTALLA PRINCIPAL" onclick="backTo_InitMenu()" readonly="readonly"/>
 	</div>
 
-	<div id="ayudaTransplante" style="display: none;" class=".ayudaDebil" onclick="ayudaTransplante()">
+	<div id="ayudaError_medico" style="display: none"; class="ayudaDebil">
+	</div>
+
+	<div id="ayudaGuante_de_latex" style="display: none"; class="ayudaDebil">
+	</div>
+
+	<div id="ayudaTransplante" style="display: none;" class=".ayudaDebil">
 		<div id="ayudaTransplanteParteSup">
 			<div class="iconoCartaEspecial">
 			</div>
@@ -154,16 +160,22 @@
 			</div>
 		</div>
 		<div id="ayudaTransplanteParteInf">
-			<div class="cartaIzq">
+			<div class="cartaIzq" onclick="removeOrgano1Transplante()">
 				<div class="tituloCartaIzq">Organo 1</div>
 				<div class="imagenCartaIzq"></div>
 			</div>
-			<div class="cartaDcha">
+			<div class="cartaDcha" onclick="removeOrgano2Transplante()">
 				<div class="tituloCartaDcha">Organo 2</div>
 				<div class="imagenCartaDcha"></div>
 			</div>
 		</div>
 		<div id="ayudaTransplantePie">(Toca en un recuadro superior para eliminar la seleccion)</div>
+	</div>
+
+	<div id="ayudaLadron_de_organos" style="display: none"; class="ayudaDebil">
+	</div>
+
+	<div id="ayudaContagio" style="display: none"; class="ayudaDebil">
 	</div>
 
 	<div id="canvas_container" style="position: relative; display: none;">

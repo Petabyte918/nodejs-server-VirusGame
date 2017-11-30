@@ -405,3 +405,8 @@ socket.on('checkMatchRunningKO', function(){
 			'</div>'
 		);
 	}
+
+
+db.collection(USERS_COLLECTION).find({usuario: data.usuario}).toArray(function(err, doc) ;
+db.collection(USERS_COLLECTION).insertOne(newUser, function(err, doc);
+db.collection(USERS_COLLECTION).updateOne({_id: id}, user, function(err, doc)

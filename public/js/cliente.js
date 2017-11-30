@@ -8,7 +8,7 @@ var ayudaDebil;
 /** Establecimiento de la conexion con el servidor **/
 socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
 //Local
-//var socket = io.connect('https://localhost:8080');
+//var socket = io.connect('http://localhost:8080');
 socket.on('Connection OK', function (data) {
    	console.log("Cliente conectado. Player_id: "+data.player_id);
    	usuario = data.player_id;
@@ -612,6 +612,7 @@ function esperarMovimiento(){
 					console.log("Hemos ganado");
 					var data = {
 						idPartida: idPartida,
+						infoJugadores: infoJugadores,
 						ganador: infoJugadores[ganador].nombre
 					}
 					socket.emit('terminarPartida', data);
@@ -735,6 +736,7 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 
 	clearTimeout(countDownSTO);
 	clearTimeout(esperarMovSTO);
+	cerrarAyudaCartas();
 
 	movJugador = datos_partida.movJugador;
 
@@ -756,7 +758,7 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 		actualizarCanvas();
 	}
 	//Pero solo le permitimos recuperar sus cartas en SU turno
-	if ((finDescarte == false) && (usuario == data.turno)) {
+	if ((finDescarte == false) && (usuario == datos_partida.turno)) {
 		$("#descartes_boton").css("display","inline");
 	}
 

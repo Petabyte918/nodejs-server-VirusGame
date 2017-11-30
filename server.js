@@ -376,6 +376,11 @@ io.on('connection', function(socket) {
 		var organosJugadoresCli = datos_partida.organosJugadoresCli;
 		var movJugador = datos_partida.movJugador;
 
+		//Si la partida no existe no retransmito nada
+		if (partidas[idPartida] == undefined) {
+			console.log("siguienteTurnoSrv: Partida no existe");
+		}
+
 		//Comprobacion si la baraja de cartas se esta manejando bien
 		//console.log("Baraja de la partida-cartas: "+deckOfCardsPartida.length);
 		if (deckOfCardsPartida.length == 0){
@@ -395,6 +400,12 @@ io.on('connection', function(socket) {
 				jugadores.splice(posJug, 1);
 				//Lo elimino de infoJugadores
 				delete infoJugadores[idJugador];
+
+				//Si no quedan mas jugadores, elimino la partida
+				if ((Object.keys(infoJugadores)).lenght == 0) {
+					console.log("No quedan mas jugadores, partida eliminada");
+					delete partidas[idPartida];
+				}
 			}
 		}
 
@@ -405,7 +416,7 @@ io.on('connection', function(socket) {
 		} else {
 			index = 0;
 		}
-		console.log("Turno de: "+index+".- "+jugadores[index]);
+		//console.log("Turno de: "+index+".- "+jugadores[index]);
 
 		var newDatos_partida = {
 			idPartida: idPartida,
@@ -451,6 +462,13 @@ io.on('connection', function(socket) {
 
 	socket.on('terminarPartida', function(data){
 		console.log("Terminar partida");
+
+		//Evito mensajes retrasados
+		if (partidas[idPartida] == undefined) {
+			console.log("Mensaje retrasado pre-emit. Terminar Partida");
+			return;
+		}
+
 		var socket = "";
 		var idPartida = data.idPartida;
 		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
@@ -466,7 +484,7 @@ io.on('connection', function(socket) {
 		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
 			socketid = partidas[idPartida].gamePlayers[i];
 			userName = data.infoJugadores[socketid].nombre;
-			console.log("Jugador: "+userName);
+			//console.log("Jugador: "+userName);
 			if (userName == "Anonimo") {
 				continue;
 			}
@@ -740,7 +758,7 @@ card.prototype.toString = function () {
 }
 
 function initDeckOfCards(){
-	for (var i = 0; i < 50; i++) {
+	for (var i = 0; i < 5; i++) {
 		deckOfCards.push(new card(cardType.organo, 'hueso', 'img/cardImagesLQ/organos/orgaHueso.png'));
 		deckOfCards.push(new card(cardType.organo, 'corazon', 'img/cardImagesLQ/organos/orgaCorazon.png'));
 		deckOfCards.push(new card(cardType.organo, 'higado', 'img/cardImagesLQ/organos/orgaHigado.png'));
@@ -758,14 +776,14 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.virus, 'higado', 'img/cardImagesLQ/virus/virusHigado.png'));
 		deckOfCards.push(new card(cardType.virus, 'cerebro', 'img/cardImagesLQ/virus/virusCerebro.png'));
 	}
-	for (var i = 0; i < 50; i++) {
-		deckOfCards.push(new card(cardType.tratamiento, 'error medico', 'img/cardImagesLQ/especiales/errorMedico.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'guante de latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
+	for (var i = 0; i < 3; i++) {
+		deckOfCards.push(new card(cardType.tratamiento, 'error_medico', 'img/cardImagesLQ/especiales/errorMedico.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'guante_de_latex', 'img/cardImagesLQ/especiales/guanteDeLatex.png'));
 		deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImagesLQ/especiales/transplante.png'));
-		deckOfCards.push(new card(cardType.tratamiento, 'ladron de organos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
+		deckOfCards.push(new card(cardType.tratamiento, 'ladron_de_organos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
 		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
-	for (var i = 0; i < 1; i++) {
+	for (var i = 0; i < 2; i++) {
 		deckOfCards.push(new card(cardType.organo, 'organoComodin', 'img/cardImagesLQ/organos/orgaComodin.png'));
 		deckOfCards.push(new card(cardType.medicina, 'comodin', 'img/cardImagesLQ/medicinas/medComodin.png'));
 		deckOfCards.push(new card(cardType.virus, 'comodin', 'img/cardImagesLQ/virus/virusComodin.png'));

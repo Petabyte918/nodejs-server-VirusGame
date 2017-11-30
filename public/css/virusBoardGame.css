@@ -662,8 +662,8 @@ input:checked + .slider:before {
 	position: absolute;
     border: solid white 1px;
     width: 30%;
-    left: 2em;
-    top: 20em;
+    right: 0.2em;
+    bottom: 0.2em;
 
     border: solid rgb(153, 0, 204) 5px;
     border-radius: 15px;
@@ -708,6 +708,7 @@ input:checked + .slider:before {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     width: 4em;
+    background-size: cover;
 }
 
 .cartaDcha {
@@ -730,6 +731,7 @@ input:checked + .slider:before {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     width: 4em;
+    background-size: cover;
 }
 
 .iconoCartaEspecial {
