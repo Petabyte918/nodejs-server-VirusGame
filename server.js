@@ -5,6 +5,7 @@ var https = require('https');
 var fs = require('fs');
 var socketIO = require('socket.io');
 var mongodb = require("mongodb");
+var CryptoJS = require("crypto-js");
 
 
 var app = express();
@@ -556,10 +557,17 @@ io.on('connection', function(socket) {
 	    	/**console.log("login_user->find->err: "+err);
 	    	console.log("login_user->find->doc: "+doc);**/
 	    	var loginOk = false;
+	    	//Este for es un tanto inutil, pues solo deberia haber un campo con el mismo nombre de usuario
+	    	//pero por si acaso
 	    	for (var i in doc) {
 	    		/**console.log("login_user->find->i: "+i);
 	    		console.log("login_user->find->doc[i]: "+doc[i]);**/
-	    		if (doc[i].pass == data.pass) {
+
+	    		//Encriptamos la contraseña enviada para compararla con la almacenada
+				var cipherpass = CryptpJS.AES.encrypt(data.pass, 'clave muy secreta');
+				console.log("Pass encriptada enviada: "+cipherpass);
+				console.log("Pass encriptada almacenada: "+data[i].pass);
+	    		if (doc[i].pass == cipherpass) {
 	    			loginOk = true;
 	    		}
 	    	}
@@ -591,9 +599,15 @@ io.on('connection', function(socket) {
 	    	}**/
 		    if (doc == "") {
 		      	console.log("register_user: El usuario no esta repetido");
+
+		      	//Encriptamos la contraseña antes de almacenarla en la base de datos
+		      	console.log("Pass sin encriptar: "+data.pass);
+				var cipherpass = CryptpJS.AES.encrypt(data.pass, 'clave muy secreta');
+				console.log("Pass encriptada: "+cipherpass);
+
 				var newUser = {
 					"usuario": data.usuario,
-					"pass": data.pass,
+					"pass": data.cipher,
 					"stats": {
 						"wins": 0,
 						"losts": 0,
@@ -602,6 +616,7 @@ io.on('connection', function(socket) {
 						"retired": 0
 					}
 				};
+
 				db.collection(USERS_COLLECTION).insertOne(newUser, function(err, doc) {
 				    if (err) {
 				    	console.log("register_user->find->insertOne->err: "+err);
