@@ -560,14 +560,22 @@ io.on('connection', function(socket) {
 	    	//Este for es un tanto inutil, pues solo deberia haber un campo con el mismo nombre de usuario
 	    	//pero por si acaso
 	    	for (var i in doc) {
-	    		/**console.log("login_user->find->i: "+i);
-	    		console.log("login_user->find->doc[i]: "+doc[i]);**/
+	    		//Doc es un array de los diferentes usuarios y sus diferentes campos
+			    /**for (var i in doc) {
+			    	for (var elem in doc[i]){
+		    			console.log("Users got: doc[i]-elements-> "+doc[i]+"-"+elem);
+		    		}
+		    	}**/
 
 	    		//Encriptamos la contraseña enviada para compararla con la almacenada
-				var cipherpass = CryptpJS.AES.encrypt(data.pass, 'clave muy secreta');
+				/**var cipherpass = CryptoJS.AES.encrypt(data.pass, 'clave muy secreta');
 				console.log("Pass encriptada enviada: "+cipherpass);
-				console.log("Pass encriptada almacenada: "+data[i].pass);
-	    		if (doc[i].pass == cipherpass) {
+				console.log("Pass encriptada almacenada: "+doc[i].pass);**/
+				var decipherpass = CryptoJS.AES.decrypt(doc[i].pass, 'clave muy secreta');
+				var decipherpassUTF8 = decipherpass.toString(CryptoJS.enc.Utf8);
+				//console.log("Pass desencriptada almacenada: "+decipherpassUTF8);
+				//console.log("Pass no encriptada enviada: "+data.pass);
+	    		if (data.pass == decipherpassUTF8) {
 	    			loginOk = true;
 	    		}
 	    	}
@@ -598,16 +606,27 @@ io.on('connection', function(socket) {
 	    		console.log("register_user->find->doc[i]: "+doc[i]);
 	    	}**/
 		    if (doc == "") {
-		      	console.log("register_user: El usuario no esta repetido");
+		      	//console.log("register_user: El usuario no esta repetido");
 
 		      	//Encriptamos la contraseña antes de almacenarla en la base de datos
-		      	console.log("Pass sin encriptar: "+data.pass);
-				var cipherpass = CryptpJS.AES.encrypt(data.pass, 'clave muy secreta');
-				console.log("Pass encriptada: "+cipherpass);
+		      	//console.log("Register_User: Pass sin encriptar: "+data.pass);
+				var cipherpass = CryptoJS.AES.encrypt(data.pass, 'clave muy secreta');
+				var cipherpassStr = cipherpass.toString();
+				//Comprobando encriptacion
+				/**var decipherpass = CryptoJS.AES.decrypt(cipherpass, 'clave muy secreta');
+				var decipherpassStr = CryptoJS.AES.decrypt(cipherpassStr, 'clave muy secreta');
+				var decipherpassStr_toString = decipherpassStr.toString(CryptoJS.enc.Utf8);
+
+				console.log("RegisterUser: Pass desencriptada: "+decipherpass);
+				console.log("RegisterUser: PassStr desencriptada: "+decipherpassStr);
+				console.log("RegisterUser: PassStr_toStr() desencriptada: "+decipherpassStr_toString);
+
+				console.log("Register_User: Pass encriptada: "+cipherpass);
+				console.log("Register_User: PassStr encriptada: "+cipherpassStr);**/
 
 				var newUser = {
 					"usuario": data.usuario,
-					"pass": data.cipher,
+					"pass": cipherpassStr,
 					"stats": {
 						"wins": 0,
 						"losts": 0,
@@ -619,7 +638,7 @@ io.on('connection', function(socket) {
 
 				db.collection(USERS_COLLECTION).insertOne(newUser, function(err, doc) {
 				    if (err) {
-				    	console.log("register_user->find->insertOne->err: "+err);
+				    	console.log("register_user->find->insertOne->"+err);
 				        socket.emit('register_user-KO', 'Usuario no repetido pero error al registrarlo');
 				    } else {
 						console.log("User Added: "+doc.message);
