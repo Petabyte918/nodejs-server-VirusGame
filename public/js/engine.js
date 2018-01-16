@@ -86,11 +86,22 @@ function prepararOrganosJugadoresCli(){
 	}
 }
 
-function getUsersSorted (optionRanquing, data, maxLoop) {
+function getUsersSorted (optionRanquing, data) {
 	//Para no cargarnos data
 	var auxData = $.extend(true,{},data);
 	var sortedObj = {};
 	var objIndex = 0;
+
+	//Si hay menos usuarios que la cantidad de gente del ranquing que queremos mostrar
+	var keysObj = Object.keys(data);
+	var numUsers = keysObj.length;
+	var maxLoop = -1;
+
+	if (numUsers < 10) {
+		maxLoop = numUsers;
+	} else {
+		maxLoop = 10;
+	}
 
 	if (optionRanquing == "wins") {
 		var topWin = -1;
@@ -118,6 +129,10 @@ function getUsersSorted (optionRanquing, data, maxLoop) {
 		for (var cont = 0; cont < maxLoop; cont++) {
 			for (var i in auxData) {
 				percent = auxData[i].stats.wins / auxData[i].stats.total;
+				//Nos protegemos del Nah
+				if (isNaN(percent)) {
+					percent = 0;
+				}
 				if (percent > topPercent) {
 					topPercent = percent;
 					objIndex = i;
@@ -126,8 +141,8 @@ function getUsersSorted (optionRanquing, data, maxLoop) {
 			var auxObj = $.extend(true,{},auxData[objIndex]);
 			delete auxData[objIndex];
 			sortedObj[cont] = auxObj;
-			topWin = -1;
-			win = -1;
+			topPercent = -1;
+			percent = -1;
 			objIndex = 0;
 		}
 	}
@@ -221,10 +236,8 @@ function takeCard(){
 Engine = new function () {
 	//Responsive canvas
 	this.initCanvas = function(){
-		windowWidth = window.innerWidth;
-		windowHeight = window.innerHeight;
 
-		//Canvas principal - cosas que se mueven (se borra continuamente)
+		//Canvas frontal - cosas que solo se mueven
 		cv = document.getElementById('canvas');
 		cv.width = windowWidth;
 		cv.height = windowHeight;
@@ -232,7 +245,16 @@ Engine = new function () {
 		cx.fillStyle = "rgba(0,0,255,0)";
 		cx.fillRect(0,0,windowWidth,windowHeight);
 
+		//Canvas apoyo - cosas que se mueven (es un apoyo del frontal)
+		cvAPO = document.getElementById('canvasAPO');
+		cvAPO.width = windowWidth;
+		cvAPO.height = windowHeight;
+		cxAPO = cvAPO.getContext('2d');
+		cxAPO.fillStyle = "rgba(0,0,255,0)";
+		cxAPO.fillRect(0,0,windowWidth,windowHeight);
+
 		//Canvas del medio - turnos y estado tablero (se borra a veces)
+		//Este canvas se actualiza junto con el reloj
 		cvMID = document.getElementById('canvasMID');
 		cvMID.width = windowWidth;
 		cvMID.height = windowHeight;
@@ -451,12 +473,15 @@ Engine = new function () {
 		}
 	}	
 	this.initPosCartasUsuario = function(){
-		//La posY sera 5px debajo de los cubos
-		var posY = posCubosDescarte[1].y + posCubosDescarte.heightCubo - 20;
-		//La altura de las cartas del usuario sera el espacio entre los cubos y los organos del usuario
-		var heightCarta = posOrganosJugadores[1].posCerebro[1] - posY - 70;
+
+		var distDisp = posCubosDescarte[1].y + posCubosDescarte.heightCubo;
+		//La altura de las cartas del usuario sera proporcional al espacio entre los cubos y los organos del usuario
+		var heightCarta = (posOrganosJugadores[1].posCerebro[1] - distDisp - 70) * 0.90;
 		//La anchura de las cartas del usuario esta en proporcion con (1536/1013)
 		var widthCarta = heightCarta * (1013/1536);
+
+		//La posY sera centrada entre los cubos y el espacio para los organos
+		var posY = ((distDisp - heightCarta) / 2) + posCubosDescarte[1].y;
 
 		var posCarta1 = [windowWidth/2 - widthCarta*1.5 - 10, posY];
 		var posCarta2 = [windowWidth/2 - widthCarta*0.5, posY];

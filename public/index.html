@@ -3,6 +3,8 @@
 <head>
 	<title>TFG_VirusBoardGame</title>
 	<link href='https://fonts.googleapis.com/css?family=Oleo+Script' rel='stylesheet' type='text/css'>
+	<link href="https://fonts.googleapis.com/css?family=PT+Sans+Caption" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lora|Ubuntu" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="css/virusBoardGame.css" media="screen" />
 
 	<script src="Jquery/jquery-3.2.1.min.js"></script>
@@ -77,9 +79,9 @@
 		<div class="ranquingIndices ranquingLine">
 			<a id="ranquingPos" class="ranquingPos">Pos</a>
 			<a id="ranquingUsuario" class="ranquingUsuario">Usuario</a>
-			<a id="ranquingPercent" class="ranquingPercent">%</a>
-			<a id="ranquingWins" class="ranquingWins">Victorias</a>
-			<a id="ranquingTotal" class="ranquingTotal">Total</a>
+			<a id="ranquingPercent" class="ranquingPercent" onclick="sortRanquing('percent')">%</a>
+			<a id="ranquingWins" class="ranquingWins" onclick="sortRanquing('wins')">Victorias</a>
+			<a id="ranquingTotal" class="ranquingTotal" onclick="sortRanquing('total')">Total</a>
 		</div>
 	</div>
 
@@ -161,11 +163,11 @@
 		</div>
 		<div id="ayudaTransplanteParteInf">
 			<div class="cartaIzq" onclick="removeOrgano1Transplante()">
-				<div class="tituloCartaIzq">Organo 1</div>
+				<div class="tituloCartaIzq">Órgano 1</div>
 				<div class="imagenCartaIzq"></div>
 			</div>
 			<div class="cartaDcha" onclick="removeOrgano2Transplante()">
-				<div class="tituloCartaDcha">Organo 2</div>
+				<div class="tituloCartaDcha">Órgano 2</div>
 				<div class="imagenCartaDcha"></div>
 			</div>
 		</div>
@@ -180,6 +182,10 @@
 
 	<div id="canvas_container" style="position: relative; display: none;">
 		<canvas id="canvas" width="1000px" height="700px"
+				style="position: absolute; left: 0; top: 0; z-index: 6;">
+			Your browser does not support canvas
+		</canvas>
+		<canvas id="canvasAPO" width="1000px" height="700px"
 				style="position: absolute; left: 0; top: 0; z-index: 5;">
 			Your browser does not support canvas
 		</canvas>
@@ -191,6 +197,229 @@
 				style="position: absolute; left: 0; top: 0; z-index: 3;">
 			Your browser does not support canvas
 		</canvas>
+	</div>
+
+	<div id="cuadroPartidaRapida" style="display: none;">
+		<a class="notaEncabezado">(Juega en la partida con más posibilidades de empezar antes)</a>
+		<a class="tituloCartaIzq">Actualmente:</a>
+		<a id="partidaRapidaNombre">-Partida: Partida de Perry maison</a>
+		<a id="partidaRapidaJugadores">-(Necesarios 2 jugadores)</a>
+	</div>
+
+	<div id="instrucciones" onclick="mostrarInstrucciones()">Instrucciones</div>
+
+
+	<div id="container_instrucciones1" style="display: none;">
+		<h1 class=tituloEnumInstrucciones>
+			<span class="tittleSeccion1">¿CÓMO JUGAR A VIRUS?</span></br>
+		</h1>
+		<h2 class="resaltadoEnumInstrucciones">
+			Virus es un sencillo y divertido juego de cartas.
+		</h2>
+
+		<p class="textoEnumInstrucciones">
+		<b>1.- </b>Hay 4 tipos de cartas diferentes: órganos, virus, medicinas y <b>cartas especiales</b> de tratamiento.</br>
+		<b>2.- </b>Para usar las cartas de tu mano, ¡simplemente arrástralas!</br>
+		<b>3.- </b>Las cartas de órganos sólo puedes usarlas sobre ti mismo.</br>
+		<b>4.- </b>Las cartas de medicinas y virus puedes usarlas contra un órgano del mismo color que tu carta <b>de cualquier jugador.</b> Aunque, ¿para que ibas a usar un virus sobre ti mismo? ¿O una medicina para curar algún órgano de tu rival?</br>
+		<b>5.- </b>Reune <b>cuatro órganos sanos de distinto color</b> para ganar el juego.</br> 
+		<b>6.- </b>No puedes tener en tu cuerpo <b>dos órganos iguales</b> en ningún momento.</br>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+		No te preocupes si no sabes usar las cartas especiales todavía. Cuando vayas a jugarlas, aparecerá un mensaje de ayuda.</br></br>
+		</p>
+
+		<h2 class="resaltadoEnumInstrucciones">
+		¡SUERTE!
+		</h2>
+		</br>
+
+		<div class="backNext_Container">
+			<div class="instruccionesBack" style="visibility: hidden;">Atrás</div>
+			<div class="numPagInstrucciones">1/5</div>
+			<div class="instruccionesNext" onclick="mostrarInstrucciones('container_instrucciones2')">Siguiente</div>
+		</div>
+	</div>
+
+	<div id="container_instrucciones2" style="display: none;">
+		<img id="iconoOrgano" src="css/img/iconosEspeciales/iconoOrgano.png" />
+		<span class="tittleSeccion1">Tipo de carta - ÓRGANOS</span></br>
+		<img id="iconoColorOrganos" src="css/img/iconosEspeciales/iconoColorOrganos.png" />
+		<span class="textoSeccion1">
+			Reune <b>cuatro órganos sanos de distinto color</b> para ganar el juego. No puedes tener en tu cuerpo dos órganos iguales en ningún momento.</br>
+		</span>
+
+		<p class="textoEnumInstrucciones">
+			<img id="iconoOrgano" src="css/img/iconosEspeciales/iconoOrganoComodin.png" />
+			<span class="tittleSeccion3">ÓRGANO MULTICOLOR</span></br>
+			<span class="textoSeccion3">
+				Este órgano actúa como comodín para ayudarte a completar tu cuerpo y cuenta como órgano a todos los efectos.</br>
+				Puede vacunarse con una medicina de cualquier color, pero tambien puede ser infectado por un virus de cualquier color.</br></br>
+				<b>Nota: </b>Tu cuerpo podrá tener cinco órganos distintos si uno de ellos es el multicolor, y puedes ganar la partida si cuatro de ellos están sanos.</br>
+			</span>
+			</br>
+		</p>
+
+		<div class="backNext_Container">
+			<div class="instruccionesBack" onclick="mostrarInstrucciones('container_instrucciones1')">Atrás</div>
+			<div class="numPagInstrucciones">2/5</div>
+			<div class="instruccionesNext" onclick="mostrarInstrucciones('container_instrucciones3')">Siguiente</div>
+		</div>
+	</div>
+
+	<div id="container_instrucciones3" style="display: none;">
+		<img id="iconoVirus" src="css/img/iconosEspeciales/iconoVirus.png" />
+		<span class="tittleSeccion1">Tipo de carta - VIRUS</span></br>
+		<span class="textoSeccion1">
+			Usa las cartas de virus para destruir los órganos y medicinas de tus rivales. Los virus solo tienen efecto sobre órganos y medicinas de su mismo color.
+		</span>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoVirusInfectar.png" />
+			<span class="tittleSeccion2">INFECTAR</span></br>
+			<span class="textoSeccion2">
+				Arrastra una carta de virus sobre un órgano libre para infectarlo. <b>No podras completar tu cuerpo</b> si alguno de tus órganos está infectado por un virus.
+			</span>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoVirusExtirpar.png" />
+			<span class="tittleSeccion2">EXTIRPAR</span></br>
+			<span class="textoSeccion2">
+				<b>Destruye un órgano infectado. </b>Coloca un segundo virus sobre un órgano ya infectado: Ese órgano es destruido y las tres cartas van a la pila de descarte.
+			</span>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoVirusDestruirVacuna.png" />
+			<span class="tittleSeccion2">DESTRUIR VACUNA</span></br>
+			<span class="textoSeccion2">
+				<b>Destruye una vacuna.</b> Elimina la proteccion otorgada por una medicina en un órgano.</br>
+			</span>
+		</p>
+		</br>
+
+		<p class="textoEnumInstrucciones">
+			<img id="iconoOrgano" src="css/img/iconosEspeciales/iconoVirusComodin.png" />
+			<span class="tittleSeccion3">VIRUS MULTICOLOR</span></br>
+			<span class="textoSeccion3">
+				Este virus <b>comodin</b> puede infectar un órgano o destruir una vacuna de cualquier color</br>
+			</span>
+			</br>
+		</p>
+
+		<div class="backNext_Container">
+			<div class="instruccionesBack" onclick="mostrarInstrucciones('container_instrucciones2')">Atrás</div>
+			<div class="numPagInstrucciones">3/5</div>
+			<div class="instruccionesNext" onclick="mostrarInstrucciones('container_instrucciones4')">Siguiente</div>
+		</div>
+	</div>
+
+	<div id="container_instrucciones4" style="display: none;">
+		<img id="iconoMedicina" src="css/img/iconosEspeciales/iconoMedicina.png" />
+		<span class="tittleSeccion1">Tipo de carta - MEDICINAS</span></br>
+		<span class="textoSeccion1">
+			Las cartas de medicina sirven para proteger tus órganos de los virus. Pueden destruir cartas de virus o proteger órganos para evitar que sean infectados. Utiliza las cartas de medicina sólo sobre cartas (virus u órganos) de su mismo color.</br>
+		</span>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoMedicinaCurar.png" />
+			<span class="tittleSeccion2">CURAR</span></br>
+			<span class="textoSeccion2">
+				<b>Destruye un virus.</b> Utiliza una medicina para contrarrestar el efecto de un virus de su mismo color que se encuentre sobre un órgano.</br>
+			</span>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoMedicinaVacunar.png" />
+			<span class="tittleSeccion2">VACUNAR</span></br>
+			<span class="textoSeccion2">
+				<b>Protege un órgano.</b> Arrastra una medicina sobre un órgano libre de su mismo color. Ahora tus rivales necesitan dos virus para infectar tu órgano.</br>
+			</span>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoMedicinaInmunizar.png" />
+			<span class="tittleSeccion2">INMUNIZAR</span></br>
+			<span class="textoSeccion2">
+				Arrastra una segunda medicina sobre un órgano. Este queda <b>protegido para siempre</b> contra el ataque de cualquier virus y no podrá ser destruido ni afectado por las cartas de tratamiento.</br>
+			</span>
+		</p>
+		</br>
+
+		<p class="textoEnumInstrucciones">
+			<img id="iconoOrgano" src="css/img/iconosEspeciales/iconoMedicinaComodin.png" />
+			<span class="tittleSeccion3">MEDICINAS MULTICOLOR</span></br>
+			<span class="textoSeccion3">
+				Estas medicinas son <b>comodines.</b> Utilízalas para curar virus o vacunar órganos de cualquier color.</br>
+			</span>
+			</br>
+		</p>
+
+		<div class="backNext_Container">
+			<div class="instruccionesBack" onclick="mostrarInstrucciones('container_instrucciones3')">Atrás</div>
+			<div class="numPagInstrucciones">4/5</div>
+			<div class="instruccionesNext" onclick="mostrarInstrucciones('container_instrucciones5')">Siguiente</div>
+		</div>
+	</div>
+
+	<div id="container_instrucciones5" style="display: none;">
+		<img id="iconoTratamiento" src="css/img/iconosEspeciales/iconoTratamiento.png" />
+		<span class="tittleSeccion1">Tipo de carta - TRATAMIENTOS</span></br>
+		<span class="textoSeccion1">
+			Las cartas de tratamiento pueden alterar el juego para ayudarte a ganar.</br>Utilízalas en tu beneficio o para evitar que tus rivales completen su cuerpo antes que tú.</br>
+		</span>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoTransplante.png" />
+			<span class="tittleSeccion2">TRANSPLANTE</span></br>
+			<span class="textoSeccion2">
+				<b>Intercambia</b> un órgano por otro entre dos jugadores cualesquiera. No importa si el color de los órganos es diferente, ni si están sanos, infectados o vacunados. Sencillamente el jugador cambia el órgano escogido por otro, siempre y cuando ninguno de los dos jugadpres tenga dos órganos del mismo colo ni estos estén inmunizados.</br>
+			</span>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoLadronDeOrganos.png" />
+			<span class="tittleSeccion2">LADRÓN DE ÓRGANOS</span></br>
+			<span class="textoSeccion2">
+				<b>Roba un órgano.</b> de otro jugador y añadelo a tu cuerpo. Puedes robar órganos sanos, vacunados o infectados, pero no inmunes. Recuerda que no puedes tener dos órganos del mismo color.</br>
+			</span>
+		</p>
+
+		<!--<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoContagio.png" />
+			<span class="tittleSeccion2">CONTAGIO</span></br>
+			<span class="textoSeccion2">
+				Arrastra una segunda medicina sobre un órgano. Este queda <b>protegido para siempre</b> contra el ataque de cualquier virus y no podrá ser destruido ni afectado por las cartas de tratamiento.</br>
+			</span>
+		</p>-->
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoGuanteDeLatex.png" />
+			<span class="tittleSeccion2">GUANTE DE LATEX</span></br>
+			<span class="textoSeccion2">
+				Todos los jugadores excepto el que utiliza el guante, <b>descartan su mano. </b> Al comienzo de su siguiente turno, al no tener cartas, estos jugadores tan solo podrán robar una nueva mano, perdiendo así un turno de juego.</br>
+			</span>
+		</p>
+
+		<p class="textoEnumInstrucciones">
+			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoErrorMedico.png" />
+			<span class="tittleSeccion2">ERROR MEDICO</span></br>
+			<span class="textoSeccion2">
+				<b>Intercambia todo tu cuerpo</b> por el de otro jugador, incluyendo órganos virus y vacunas. No importa el número de cartas que cada uno tenga en la mesa. Cuando usas esta carta, <b>los órganos inmunizados también son intercambiados.</b></br>
+			</span>
+			</br>
+		</p>
+
+		<div class="backNext_Container">
+			<div class="instruccionesBack" onclick="mostrarInstrucciones('container_instrucciones4')">Atrás</div>
+			<div class="numPagInstrucciones">5/5</div>
+			<div class="instruccionesNext" style="visibility: hidden;">Siguiente</div>
+		</div>
+
+		<!--<div id=pauseButton>
+		</div>-->
 	</div>
 
 </body>

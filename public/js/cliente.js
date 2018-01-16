@@ -6,7 +6,8 @@ var enPartidaEsperando = false;
 var ayudaFuerte;
 var ayudaDebil;
 /** Establecimiento de la conexion con el servidor **/
-socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
+var socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
+
 //Local
 //var socket = io.connect('http://localhost:8080');
 socket.on('Connection OK', function (data) {
@@ -16,9 +17,13 @@ socket.on('Connection OK', function (data) {
    	actualizar_partidas();
 });
 /** -------------------- **/
+//Tam Pantalla
+windowWidth = window.innerWidth;
+windowHeight = window.innerHeight;
 
 function configInicial() {
 	console.log("configInicial()");
+
 	var autoLogin = localStorage.getItem('autoLogin');
 	if (autoLogin == "") {
 		document.form_settings_user.autoLoginName.checked = true;
@@ -66,15 +71,7 @@ function configInicial() {
 	}
 
 	//Posicion Cuadros ayuda
-	//Partida Rapida
-	var elemBotJug = document.getElementById('boton_jugar');
-	var posBotJug = elemBotJug.getBoundingClientRect();
-	var posX = (Math.floor(posBotJug.left + posBotJug.width + 10)).toString()+"px";
-	var posY = (Math.floor(posBotJug.top + posBotJug.height -110)).toString()+"px";
-	//console.log("posX: "+posX+", posY: "+posY);
-	$("#cuadroPartidaRapida").css("left", posX);
-	$("#cuadroPartidaRapida").css("top", posY);
-	$("#cuadroPartidaRapida").css("display", "block");
+	reDimPartidaRapida();	
 
 	//Option Ranquing
 	var optionRanquing = localStorage.getItem('optionRanquing');
@@ -101,6 +98,12 @@ function button_create() {
 	$("#userNameContainer").css("display", "none");
 	$("#register").css("display", "none");
 	$("#cuadroPartidaRapida").css("display", "none");
+	$("#instrucciones").css("display", "none");
+	$("#container_instrucciones1").css("display", "none");
+	$("#container_instrucciones2").css("display", "none");
+	$("#container_instrucciones3").css("display", "none");
+	$("#container_instrucciones4").css("display", "none");
+	$("#container_instrucciones5").css("display", "none");
 }
 
 function button_lista_partidas() {
@@ -119,6 +122,12 @@ function button_lista_partidas() {
 	$("#userNameContainer").css("display", "none");
 	$("#register").css("display", "none");
 	$("#cuadroPartidaRapida").css("display", "none");
+	$("#instrucciones").css("display", "none");
+	$("#container_instrucciones1").css("display", "none");
+	$("#container_instrucciones2").css("display", "none");
+	$("#container_instrucciones3").css("display", "none");
+	$("#container_instrucciones4").css("display", "none");
+	$("#container_instrucciones5").css("display", "none");
 }
 
 function backTo_InitMenu() {
@@ -133,7 +142,9 @@ function backTo_InitMenu() {
 	$("#settings").css("display", "inline");
 	$("#ranquing").css("display", "inline");
 	$("#cuadroFinPartida").css("display", "none");
+	$("#instrucciones").css("display", "inline");
 	var logged = localStorage.getItem("logged");
+	console.log("backTo_InitMenu()->logged: "+logged);
 	if (logged == "true") {
 		$("#leave").css("display", "inline");
 		$("#userNameContainer").css("display", "block");
@@ -191,6 +202,7 @@ function button_ranquing () {
 	} else {
 		$("#settingsForm").css("display","none");
 		$("#ranquingList").css("display", "block");
+		reDimRanquingList();
 	}
 	socket.emit('request_users', {request: 'create_ranquing'});
 }
@@ -274,21 +286,83 @@ function form_register() {
 
 socket.on('register_user-OK', function(message) {
 	console.log("register_user-OK");
-	document.form_login_user.loginName.value = document.form_register_user.registerName.value;
-	document.form_login_user.loginPass.value = document.form_register_user.registerPass1.value;
+	var loginName = document.form_register_user.registerName.value;
+	var loginPass = document.form_register_user.registerPass1.value;
+	document.form_login_user.loginName.value = loginName;
+	document.form_login_user.loginPass.value = loginPass;
 	document.getElementById("registerCorrection").innerHTML = "";
 	document.form_register_user.registerName.value = "";
 	document.form_register_user.registerPass1.value = "";
 	document.form_register_user.registerPass2.value = "";
 	$("#registerForm").css("display", "none");
 	$("#loginForm").css("display", "block");
+
+	//Autologin tras registrarnos correctamente
+	form_login();
 });
 
 socket.on('register_user-KO', function(message) {
 	console.log("register_user-KO: "+message);
 	document.getElementById("registerCorrection").innerHTML = "Usuario repetido";
-	document.form_register_user.registerName.value = "";
+	//Quitar ya que si por mala conexion llegan peticiones retrasadas, el campo queda vacio.
+	//Por register_user-OK ya se gestionado todo
+	//document.form_register_user.registerName.value = "";
 });
+
+function mostrarInstrucciones(pagina) {
+	//console.log("containerInstrucciones()->pagina: "+pagina);
+	var pagina = pagina;
+
+	switch(pagina) {
+	case "container_instrucciones1":
+		$("#container_instrucciones1").css("display","block");
+		$("#container_instrucciones2").css("display","none");
+		break;
+	case "container_instrucciones2":
+		$("#container_instrucciones1").css("display","none");
+		$("#container_instrucciones2").css("display","block");
+		$("#container_instrucciones3").css("display","none");
+		break;
+	case "container_instrucciones3":
+		$("#container_instrucciones2").css("display","none");
+		$("#container_instrucciones3").css("display","block");
+		$("#container_instrucciones4").css("display","none");
+		break;
+	case "container_instrucciones4":
+		$("#container_instrucciones3").css("display","none");
+		$("#container_instrucciones4").css("display","block");
+		$("#container_instrucciones5").css("display","none");
+		break;
+	case "container_instrucciones5":
+		$("#container_instrucciones4").css("display","none");
+		$("#container_instrucciones5").css("display","block");
+		break;
+	default:
+		if (($("#container_instrucciones1").css("display") == "block") ||
+			($("#container_instrucciones2").css("display") == "block") ||
+			($("#container_instrucciones3").css("display") == "block") ||
+			($("#container_instrucciones4").css("display") == "block") ||
+			($("#container_instrucciones5").css("display") == "block")) {
+
+			$("#container_instrucciones1").css("display","none");
+			$("#container_instrucciones2").css("display","none");
+			$("#container_instrucciones3").css("display","none");
+			$("#container_instrucciones4").css("display","none");
+			$("#container_instrucciones5").css("display","none");
+
+			$("#container_botones").css("visibility","visible");
+			$("#cuadroPartidaRapida").css("visibility","visible");
+		} else {
+			pagina = 'container_instrucciones1';
+		
+			$("#container_instrucciones1").css("display","block");
+			$("#container_botones").css("visibility","hidden");
+			$("#cuadroPartidaRapida").css("visibility","hidden");
+		}
+	}
+	reDimContainer_instrucciones(pagina);
+
+}
 
 function form_settings() {
 	console.log("form_settings()");
@@ -319,26 +393,26 @@ socket.on('create_ranquing', function(data) {
 	//		}
 	//	};
 
-	//Si hay menos usuarios que la cantidad de gente del ranquing que queremos mostrar
-	keysObj = Object.keys(data);
-	numUsers = keysObj.length;
-	if (numUsers < 10) {
-		maxLoop = numUsers;
-	} else {
-		maxLoop = 10;
-	}
-
 	$(".ranquingElems").remove();
 
 	var optionRanquing = localStorage.getItem('optionRanquing');
 	console.log("optionRanquing: "+ optionRanquing);
 
-	var sortedObj = getUsersSorted(optionRanquing, data, maxLoop);
+	var sortedObj = getUsersSorted(optionRanquing, data);
+	var maxLoop = (Object.keys(sortedObj)).length;
+
 
 	var html = "";
 	for (var i = 0; i < maxLoop; i++) {
 		var pos = i + 1;
 		var percent = (Math.round(((sortedObj[i].stats.wins / sortedObj[i].stats.total)*100))).toString()+"%";
+		//No mostramos porcentajes de jugadores que no han jugado partidas
+		//console.log("Percent: "+percent);
+		if (percent == "NaN%") {
+			//Los usuarios nuevos tambien aparecen
+			percent = "0%";
+			//continue;
+		}	
 		html+=
 		'<div class="ranquingElems ranquingLine">'+
 			'<a class="ranquingPos">'+pos+'</a>'+
@@ -552,6 +626,9 @@ function leavePartida(idPartida) {
 /** -------------------- **/
 
 /** Interaccion con el servidor de la partida **/
+function pausarJuego(){
+	console.log("Pausar juego");
+}
 
 socket.on('prepararPartida', function(datos_iniciales){
 	console.log("prepararPartida");
@@ -572,7 +649,7 @@ socket.on('prepararPartida', function(datos_iniciales){
 	Engine.initPosCartasUsuario();
 	Engine.initFinDescartesButton();
 
-	renderBGCards();
+	actualizarCanvasBG();
 
 	//Crea dos arrays para poder buscar informacion comodamente.
 	asignarJugadoresAPosiciones();

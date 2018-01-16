@@ -1,8 +1,38 @@
+
+html {
+	/** Para darle tamaño a body **/
+	height: 100%;
+
+	/** Ningun texto es seleccionable **/
+	-webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -ms-user-select:none;
+
+    /** Cursor por defecto **/
+    cursor: default;
+
+    /** Evitamos cualquier tipo de overflow no intencionado**/
+    overflow: hidden;
+}
+
 body {
 	margin: 0px;
 	background: url(img/startmenuBG3.jpg);
 	background-size: cover;
 	background-repeat: no-repeat;
+}
+
+div {
+	cursor: pointer;
+}
+
+input {
+	cursor: pointer;
+}
+
+input[type=text], input[type=password] {
+	cursor: text;
 }
 
 #canvas {
@@ -262,7 +292,7 @@ input.botonCrearPartida {
 	width: 50%;
 }
 
-#settings, #ranquing, #login, #register, #leave {
+#settings, #ranquing, #login, #register, #leave, #instrucciones {
 	margin: 5px;
 	margin-top: 10px;
 	padding: 25px;
@@ -320,6 +350,48 @@ input.botonCrearPartida {
 	padding: 15px 25px;
 }
 
+#instrucciones {
+	position: absolute;
+    bottom: 1em;
+    left: 8px;
+	background-repeat: no-repeat;
+	background-color: #2dc234;
+
+	background-image: -webkit-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+	background-image: -moz-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+	background-image: -o-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+	background-image: linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+
+	-ms-border-radius:4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+
+	-webkit-box-shadow: 0 5px 0 #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
+	-moz-box-shadow: 0 5px 0 #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
+	box-shadow: 0 5px 0 #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
+
+	color: #fff;
+
+	display: block;
+	font-family: 'Oleo Script', Arial, sans-serif;
+	font-size: 25px;
+	line-height: 1;
+
+	padding: 15px 25px;
+}
+
+#instrucciones:active {
+	/* Disminiumos la cantidad de sombras */
+	-webkit-box-shadow: 0 4px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+	-moz-box-shadow: 0 4px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+	box-shadow: 0 4px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+	/* Movemos ligeramente el botón hacia abajo */
+	position: absolute;
+	bottom: 0.93em;
+    left: 10px;
+}
+
 #userNameContainer {
 	float: left;
 	background: rgba(0,0,0,0.5);
@@ -346,6 +418,7 @@ input.botonCrearPartida {
 	left: 5px;
 	width: 25%;
 	height: 50%;
+	z-index: 4;
 
     background-color: rgba(128, 0, 0, 0.8);
     -webkit-transition-property: width, height; /* Safari */
@@ -370,6 +443,7 @@ input.botonCrearPartida {
 
 #ranquingList {
 	height: 80%;
+	z-index: 10;
 }
 
 #settingsForm {
@@ -413,11 +487,9 @@ input.botonCrearPartida {
 }
 
 .ranquingIndices {
-	margin-top: 0.7em;
 	border-bottom: solid white 1px;
     padding: 0em;
     line-height: 0;
-    margin-top: 1em;
 	margin-bottom: 0.1em;
 }
 
@@ -434,7 +506,6 @@ input.botonCrearPartida {
 
 .ranquingPos {
 	float: left;
-	width: 2%;
 
     border: solid white 1px;
 
@@ -451,15 +522,67 @@ input.botonCrearPartida {
 	-moz-box-shadow: inset 1px -2px 5px 4px rgb(0,0,0), 1px 1px 7px 2px rgba(0,0,0,0.75);
 	box-shadow: inset 1px -2px 5px 4px rgb(0,0,0), 1px 1px 7px 2px rgba(0,0,0,0.75);
 }
+
+.ranquingIndices > a {
+    margin-top: 0.3em;
+    margin-bottom: 0.5em;
+    padding-top: 0.8em;
+    padding-bottom: 0.7em;
+
+    border: solid 1px rgba(0, 153, 0, 0.8);
+	border-bottom: 2px;
+	-ms-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+
+	-webkit-box-shadow: 2px 3px 1px 1px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	-moz-box-shadow: 2px 3px 1px 1px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	box-shadow: 2px 3px 1px 1px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+
+	background-repeat: no-repeat;
+	background-color: rgba(0, 77, 0, 0.8);
+	background-size: cover;
+}
+
+.ranquingIndices > a:active {
+	/* Disminiumos la cantidad de sombras */
+	/* Movemos ligeramente el botón hacia abajo */
+	position: relative;
+	top: 2px;
+	left: 2px;
+}
+
+.ranquingIndices > #ranquingPos {
+	padding-left: 0.6em;
+    padding-right: 1em;
+}
+
 .ranquingIndices > .ranquingPos {
-	padding-top: 0.35em;
-    padding-left: 0.35em;
-    border: none;
-    box-shadow: none;
+    padding-bottom: 0.90em;
+
+    -webkit-box-shadow: 0px 0px 0px 0px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	-moz-box-shadow: 0px 0px 0px 0px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	box-shadow: 0px 0px 0px 0px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+}
+
+.ranquingElems > .ranquingPos {
+	width: 0.8em;
+}
+
+.ranquingIndices > .ranquingPos:active, .ranquingIndices > .ranquingUsuario:active {
+	top: 0px;
+	left: 0px;
 }
 
 .ranquingIndices > .ranquingUsuario {
-    margin-left: 1.7em;
+    margin-left: 0.5em;
+
+    padding-bottom: 0.90em;
+
+    -webkit-box-shadow: 0px 0px 0px 0px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	-moz-box-shadow: 0px 0px 0px 0px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	box-shadow: 0px 0px 0px 0px rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
 }
 
 .ranquingIndices > .ranquingPercent {
@@ -474,6 +597,7 @@ input.botonCrearPartida {
 
 }
 
+/**
 .ranquingUsuario > .ranquingPrimero {
 	background-color: rgba(230, 172, 0, 0.8);
     -webkit-transition-property: width, height; 
@@ -530,6 +654,7 @@ input.botonCrearPartida {
 	-moz-box-shadow: inset 1px -2px 5px 4px #993300, 1px 1px 7px 2px rgba(0,0,0,0.75);
 	box-shadow: inset 1px -2px 5px 4px #993300, 1px 1px 7px 2px rgba(0,0,0,0.75);
 }
+**/
 
 .ranquingUsuario {
 	float: left;
@@ -560,6 +685,13 @@ input.botonCrearPartida {
     padding-top: 0.40em;
 	margin-right: 0.5em;
 }
+
+.ranquingUsuario, .ranquingWins, .ranquingTotal, .ranquingPercent {
+	padding-left: 0.3em;
+    padding-right: 0.3em;
+    width: auto;
+}
+
 /** End Ranquing **/
 
 #registerForm > form, #loginForm > form, #settingsForm > form {
@@ -588,6 +720,12 @@ input.botonCrearPartida {
 	color: red;
 	margin-top: 1em;
 	font-size: x-large;
+}
+
+#pauseButton {
+	width: 1em;
+	height: 1em;
+	border: 1px solid black;
 }
 
 /** sliders **/
@@ -755,6 +893,45 @@ input:checked + .slider:before {
 	font-weight: bold;
 }
 
+#iconoOrgano, #iconoVirus, #iconoMedicina, #iconoTratamiento {
+	float: left;
+    width: 50px;
+    margin: 5px;
+}
+
+#iconoColorOrganos {
+	float: right;
+	height: 50px;
+	margin: 5px
+
+	box-shadow: rgb(88,1,84) 0px 0px 5px 5px;;
+}
+
+
+h1.tituloEnumInstrucciones {
+	text-align: center;
+    font-size: larger;
+}
+
+h2.resaltadoEnumInstrucciones {
+    font-weight: bold;
+    text-align: center;
+    font-size: larger;
+    margin: 2px;
+}
+
+p.textoEnumInstrucciones {
+	float: left;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.iconoEnumInstrucciones {
+	float: left;
+	width: 50px;
+	margin: 5px;
+}
+
 /**  End divs de ayuda**/
 
 #cuadroPartidaRapida {
@@ -781,3 +958,126 @@ input:checked + .slider:before {
     display: block;
     text-align: -webkit-left;
 }
+
+/** Instrucciones **/
+#container_instrucciones1, #container_instrucciones2, #container_instrucciones3,
+#container_instrucciones4, #container_instrucciones5 {
+	/**font-family: 'PT Sans Caption', sans-serif;**/
+	position: absolute;
+	border: solid rgb(153, 0, 204) 5px;
+    border-radius: 15px;
+
+    background: rgb(242, 204, 255);
+	padding: 7px;
+    font-size: 0.95em;
+
+    font-family: 'Lora', serif;
+
+    z-index: 50;
+}
+
+span.tittleSeccion1 {
+	text-align: center;
+	color: rgb(191, 0, 255);
+	font-weight: bold;
+	font-size: 1.2em;
+    text-decoration: underline;
+}
+
+span.textoSeccion1 {
+	font-size: 1em;
+
+}
+
+span.tittleSeccion2 {
+	text-align: center;
+	color: rgb(191, 0, 255);
+	font-weight: bold;
+	font-size: 0.8em;
+}
+	
+span.textoSeccion2 {
+	font-size: 0.8em;
+}
+
+span.tittleSeccion3 {
+	text-align: center;
+	color: rgb(191, 0, 255);
+	font-weight: bold;
+	font-size: 0.9em;
+}
+
+span.textoSeccion3 {
+	font-size: 0.9em;
+}
+
+div.backNext_Container {
+	margin: 2px;
+	text-align: center;
+}
+
+div.instruccionesBack {
+	float: left;
+    font-size: x-large;
+    border: solid black 2px;
+    margin: 2px;
+    padding: 3px;
+    width: 30%;
+    text-align: center;
+}
+
+div.instruccionesNext {
+	float: right;
+    font-size: x-large;
+    border: solid black 2px;
+    margin: 2px;
+    padding: 3px;
+    width: 38%;
+    text-align: center;
+}
+
+div.instruccionesBack, div.instruccionesNext {
+	border: solid 1px rgba(0, 153, 0, 0.8);
+	border-bottom: 2px;
+	-ms-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+
+	-webkit-box-shadow: 0 3px 0 rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	-moz-box-shadow: 0 3px 0 rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	box-shadow: 0 3px 0 rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+
+	background-repeat: no-repeat;
+	background-color: rgba(0, 77, 0, 0.8);
+	background-size: cover;
+
+	color: #fff;
+	display: block;
+	font-family: 'Oleo Script', Arial, sans-serif;
+	font-size: 25px;
+	line-height: 1;
+}
+
+div.instruccionesBack:active, div.instruccionesNext:active {
+	/* Disminiumos la cantidad de sombras */
+	-webkit-box-shadow: 0 2px 0 rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	-moz-box-shadow: 0 2px 0 rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	box-shadow: 0 2px 0 rgb(0, 26, 0), inset 0 2px 2px rgba(0, 51, 0, .4);
+	/* Movemos ligeramente el botón hacia abajo */
+	position: relative;
+	top: 2px;
+	left: 2px;
+}
+
+div.numPagInstrucciones {
+	width: 20%;
+    display: inline-block;
+
+    text-align: center;
+    font-size: x-large;
+    color: rgb(153, 0, 204);
+    font-weight: bold;
+}
+
+/** END instrucciones**/
