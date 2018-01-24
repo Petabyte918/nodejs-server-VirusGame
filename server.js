@@ -39,6 +39,7 @@ mongodb.MongoClient.connect(uri, function (err, database) {
 
 	//Save database object from the callback for reuse.
 	db = database;
+	console.log("-----------------------------------");
 	console.log("Database connection ready");
 
 	//Nuevo arranque del servidor
@@ -56,6 +57,7 @@ mongodb.MongoClient.connect(uri, function (err, database) {
 	//server.listen(5000, function() {
 	  console.log('Starting server');
 	  console.log("App now running on port", port);
+	  console.log("-----------------------------------");
 	});
 
 });
@@ -465,12 +467,12 @@ io.on('connection', function(socket) {
 		console.log("Terminar partida");
 
 		//Evito mensajes retrasados
-		if (partidas[idPartida] == undefined) {
-			console.log("Mensaje retrasado pre-emit. Terminar Partida");
+		if (partidas[data.idPartida] == undefined) {
+			console.log("Mensaje retrasado pre-emit. Terminar Partida.");
 			return;
 		}
 
-		var socket = "";
+		var socketid = "";
 		var idPartida = data.idPartida;
 		for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
 			socketid = partidas[idPartida].gamePlayers[i];
@@ -516,6 +518,38 @@ io.on('connection', function(socket) {
 		//partidas[idPartida].gamePlayers = [];
 		//partidas[idPartida].estado = "terminada";
 	});
+
+	socket.on('pauseGame', function(datos_partida) {
+		var idPartida = datos_partida.idPartida;
+
+		console.log("pauseGame-> gameId: "+idPartida);
+		//Enviamos la pausa a todos lo participantes
+		var socket = "";
+		//Por si llegan mensajes retrasados y la partida ha sido eliminada
+		if (partidas[idPartida] != undefined) {
+			for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
+				socketid = partidas[idPartida].gamePlayers[i];
+
+				io.to(socketid).emit('pauseGame', datos_partida);
+			}
+		}
+	})
+
+	socket.on('continueGame', function(datos_partida) {
+		var idPartida = datos_partida.idPartida;
+
+		console.log("pauseGame-> gameId: "+idPartida);
+		//Enviamos la pausa a todos lo participantes
+		var socket = "";
+		//Por si llegan mensajes retrasados y la partida ha sido eliminada
+		if (partidas[idPartida] != undefined) {
+			for (var i = 0; i < partidas[idPartida].gamePlayers.length; i++){
+				socketid = partidas[idPartida].gamePlayers[i];
+
+				io.to(socketid).emit('contineGame', datos_partida);
+			}
+		}
+	})
 
 	socket.on('checkMatchRunning', function(data){
 		console.log("Server: checkMatchRunning");
@@ -798,13 +832,13 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.organo, 'higado', 'img/cardImagesLQ/organos/orgaHigado.png'));
 		deckOfCards.push(new card(cardType.organo, 'cerebro', 'img/cardImagesLQ/organos/orgaCerebro.png'));
 	}
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < 0; i++) {
 		deckOfCards.push(new card(cardType.medicina, 'hueso', 'img/cardImagesLQ/medicinas/medHueso.png'));
 		deckOfCards.push(new card(cardType.medicina, 'corazon', 'img/cardImagesLQ/medicinas/medCorazon.png'));
 		deckOfCards.push(new card(cardType.medicina, 'higado', 'img/cardImagesLQ/medicinas/medHigado.png'));
 		deckOfCards.push(new card(cardType.medicina, 'cerebro', 'img/cardImagesLQ/medicinas/medCerebro.png'));
 	}
-	for (var i = 0; i < 4; i++) {
+	for (var i = 0; i < 0; i++) {
 		deckOfCards.push(new card(cardType.virus, 'hueso', 'img/cardImagesLQ/virus/virusHueso.png'));
 		deckOfCards.push(new card(cardType.virus, 'corazon', 'img/cardImagesLQ/virus/virusCorazon.png'));
 		deckOfCards.push(new card(cardType.virus, 'higado', 'img/cardImagesLQ/virus/virusHigado.png'));
@@ -817,7 +851,7 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.tratamiento, 'ladron_de_organos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
 		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
-	for (var i = 0; i < 2; i++) {
+	for (var i = 0; i < 0; i++) {
 		deckOfCards.push(new card(cardType.organo, 'organoComodin', 'img/cardImagesLQ/organos/orgaComodin.png'));
 		deckOfCards.push(new card(cardType.medicina, 'comodin', 'img/cardImagesLQ/medicinas/medComodin.png'));
 		deckOfCards.push(new card(cardType.virus, 'comodin', 'img/cardImagesLQ/virus/virusComodin.png'));
