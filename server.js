@@ -832,13 +832,13 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.organo, 'higado', 'img/cardImagesLQ/organos/orgaHigado.png'));
 		deckOfCards.push(new card(cardType.organo, 'cerebro', 'img/cardImagesLQ/organos/orgaCerebro.png'));
 	}
-	for (var i = 0; i < 0; i++) {
+	for (var i = 0; i < 4; i++) {
 		deckOfCards.push(new card(cardType.medicina, 'hueso', 'img/cardImagesLQ/medicinas/medHueso.png'));
 		deckOfCards.push(new card(cardType.medicina, 'corazon', 'img/cardImagesLQ/medicinas/medCorazon.png'));
 		deckOfCards.push(new card(cardType.medicina, 'higado', 'img/cardImagesLQ/medicinas/medHigado.png'));
 		deckOfCards.push(new card(cardType.medicina, 'cerebro', 'img/cardImagesLQ/medicinas/medCerebro.png'));
 	}
-	for (var i = 0; i < 0; i++) {
+	for (var i = 0; i < 4; i++) {
 		deckOfCards.push(new card(cardType.virus, 'hueso', 'img/cardImagesLQ/virus/virusHueso.png'));
 		deckOfCards.push(new card(cardType.virus, 'corazon', 'img/cardImagesLQ/virus/virusCorazon.png'));
 		deckOfCards.push(new card(cardType.virus, 'higado', 'img/cardImagesLQ/virus/virusHigado.png'));
@@ -851,11 +851,13 @@ function initDeckOfCards(){
 		deckOfCards.push(new card(cardType.tratamiento, 'ladronDeOrganos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
 		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
+	/** Para seguir mejorando esta carta y hacer pruebas
 	for (var i = 0; i < 6; i++) {
 		deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImagesLQ/especiales/transplante.png'));
 		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
-	for (var i = 0; i < 0; i++) {
+	**/
+	for (var i = 0; i < 1; i++) {
 		deckOfCards.push(new card(cardType.organo, 'organoComodin', 'img/cardImagesLQ/organos/orgaComodin.png'));
 		deckOfCards.push(new card(cardType.medicina, 'comodin', 'img/cardImagesLQ/medicinas/medComodin.png'));
 		deckOfCards.push(new card(cardType.virus, 'comodin', 'img/cardImagesLQ/virus/virusComodin.png'));
