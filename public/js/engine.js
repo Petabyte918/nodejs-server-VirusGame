@@ -175,26 +175,42 @@ function gestionarMov(movJugador){
 }
 
 function abrirAyudaCartas (numCarta) {
-	console.log("abrirAyudaCartas()");
+	console.log("abrirAyudaCartas()");	
+	//Antes de abrir nuevas cerramos las ya abiertas
+	cerrarAyudaCartas();
+
+	//Si estamos realizando un descarte no abrimos otras ayudas - Muy hacky
+	if (numCarta == "ayudaDescartes") {
+		reDimAyudaCartaEspecial("ayudaDescartes");
+		$("#ayudaDescartes").css("visibility", "visible");
+	}
+	if (finDescarte == false) {
+		return;
+	}
+
 	var cardType = cartasUsuario[numCarta].cardType;
 	var organType = cartasUsuario[numCarta].organType;
-
 	if (cardType == "tratamiento") {
 		switch (organType) {
-		case "error_medico":
-			$("#ayudaError_medico").css("display", "inline");
+		case "errorMedico":
+			reDimAyudaCartaEspecial("ayudaErrorMedico");
+			$("#ayudaErrorMedico").css("visibility", "visible");
 			break;
-		case "guante_de_latex":
-			$("#ayudaGuante_de_latex").css("display", "inline");
+		case "guanteDeLatex":
+			reDimAyudaCartaEspecial("ayudaGuanteDeLatex");
+			$("#ayudaGuanteDeLatex").css("visibility", "visible");
 			break;
 		case "transplante":
-			$("#ayudaTransplante").css("display", "inline");
+			reDimAyudaCartaEspecial("ayudaTransplante");
+			$("#ayudaTransplante").css("visibility", "visible");
 			break;
-		case "ladron_de_organos":
-			$("#ayudaLadron_de_organos").css("display", "inline");
+		case "ladronDeOrganos":
+			reDimAyudaCartaEspecial("ayudaLadronDeOrganos");
+			$("#ayudaLadronDeOrganos").css("visibility", "visible");
 			break;
 		case "contagio":
-			$("#ayudaContagio").css("display", "inline");
+			//reDimAyudaCartaEspecial("contagio");
+			//$("#ayudaContagio").css("visibility", "visible");
 			break;
 		default:
 			console.log("Abrir cartas imposible default");
@@ -205,21 +221,19 @@ function abrirAyudaCartas (numCarta) {
 
 function cerrarAyudaCartas() {
 	console.log("cerrarAyudaCartas()");
-	$("#ayudaError_medico").css("display", "none");
-	$("#ayudaGuante_de_latex").css("display", "none");
+	$("#ayudaErrorMedico").css("visibility", "hidden");
+	$("#ayudaGuanteDeLatex").css("visibility", "hidden");
 
-	//Solo si el transplante no esta en proceso
-	if (transplante.enProceso == false) {
-		$("#ayudaTransplante").css("display", "none");
-		transplante.organo1.organo = "";
-		transplante.organo1.numJug = -1;
-		transplante.organo2.organo = "";
-		transplante.organo2.numJug = -1;
+	//Solo si el transplante no esta en proceso y si lo esta no se descarta la carta
+	if ((transplante.enProceso == false) || (finDescarte == false)) {
+		$("#ayudaTransplante").css("visibility", "hidden");
 		renderOrganosTransplante();
 	}
 
-	$("#ayudaLadron_de_organos").css("display", "none");
-	$("#ayudaContagio").css("display", "none");
+	$("#ayudaLadronDeOrganos").css("visibility", "hidden");
+	$("#ayudaContagio").css("visibility", "hidden");
+
+	$("#ayudaDescartes").css("visibility", "hidden");
 }
 
 function takeCard(){
@@ -283,16 +297,16 @@ Engine = new function () {
 		var pos1, pos2, pos3, pos4, pos5, pos6 = [];
 		switch(jugadores.length){
 		case 2:
-			posJugadores = [1, 4];
+			posJugadores = [1, 5];
 			break;
 		case 3:
-			posJugadores = [1, 2, 6]; //o [1, 3, 5];
+			posJugadores = [1, 3, 5]; //o [1, 2, 6];
 			break;
 		case 4:
-			posJugadores = [1, 2, 4, 6];
+			posJugadores = [1, 3, 4, 5];
 			break;
 		case 5:
-			posJugadores = [1, 2, 3, 5, 6];
+			posJugadores = [1, 2, 3, 4, 5];
 			break;
 		case 6:
 			posJugadores = [1, 2, 3, 4, 5, 6];
@@ -504,6 +518,16 @@ Engine = new function () {
 		var posY = posCartasUsuario[4][1] + 20;
 
 		$("#descartes_boton").css({"top": posY, "left": posX});**/
+	}
+	this.initPauseButton = function() {
+		$("#pauseButton").css("visibility","visible");
+
+		var left = (Math.floor(posCubosDescarte[1].x - 50)).toString()+"px";
+		//Algo hardCoding. El 84 es la altura del elemento..claro, que tp se va a cambiar y estas hasta los huevos
+		var top = (Math.floor(windowHeight - 84 - 30)).toString()+"px";
+
+		$("#pauseButton").css("left", left);
+		$("#pauseButton").css("top", top);
 	}
 }
 

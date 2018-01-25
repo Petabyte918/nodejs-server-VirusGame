@@ -5,13 +5,14 @@ var idPartidaEsperando = "";
 var enPartidaEsperando = false;
 var ayudaFuerte;
 var ayudaDebil;
+var gamePaused = "false";
 /** Establecimiento de la conexion con el servidor **/
 var socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
 
 //Local
-//var socket = io.connect('http://localhost:8080');
+//var socket = io.connect('http://localhost:8090');
 socket.on('Connection OK', function (data) {
-   	console.log("Cliente conectado. Player_id: "+data.player_id);
+   	//console.log("Cliente conectado. Player_id: "+data.player_id);
    	usuario = data.player_id;
    	configInicial();
    	actualizar_partidas();
@@ -22,12 +23,12 @@ windowWidth = window.innerWidth;
 windowHeight = window.innerHeight;
 
 function configInicial() {
-	console.log("configInicial()");
+	//console.log("configInicial()");
 
 	var autoLogin = localStorage.getItem('autoLogin');
 	if (autoLogin == "") {
 		document.form_settings_user.autoLoginName.checked = true;
-		console.log("AutoLogin no guardado");
+		//console.log("AutoLogin no guardado");
 		localStorage.setItem('autologin', "true");
 	} else if (autoLogin == "true") {
 		document.form_settings_user.autoLoginName.checked = true;
@@ -35,7 +36,7 @@ function configInicial() {
 		var loginPass = localStorage.getItem('loginPass');
 		document.getElementById("userNameContainer").innerHTML = "Usuario: "+loginName;
 		if (loginName != "") { //true o != de ""
-			console.log("configInicial()->socket.emit-login_user");
+			//console.log("configInicial()->socket.emit-login_user");
 			socket.emit('login_user', {usuario: loginName, pass: loginPass});
 		}
 	} else {
@@ -45,7 +46,7 @@ function configInicial() {
 	ayudaDebil = localStorage.getItem('ayudaDebil');
 	if (ayudaDebil == "") {
 		document.form_settings_user.ayudaDebilName.checked = true;
-		console.log("Ayuda debil no guardada");
+		//console.log("Ayuda debil no guardada");
 		localStorage.setItem('ayudaDebil', 'true');
 		ayudaDebil = true;
 	} else if (ayudaDebil == "true") {
@@ -59,7 +60,7 @@ function configInicial() {
 	ayudaFuerte = localStorage.getItem('ayudaFuerte');
 	if (ayudaFuerte == "") {
 		document.form_settings_user.ayudaFuerteName.checked = true;
-		console.log("Ayuda fuerte no guardada");
+		//console.log("Ayuda fuerte no guardada");
 		localStorage.setItem('ayudaFuerte', 'true');
 		ayudaFuerte = true;
 	} else if (ayudaFuerte == "true") {
@@ -92,6 +93,7 @@ function button_create() {
 	$("#registerForm").css("display", "none");
 	$("#loginForm").css("display", "none");
 	$("#settings").css("display", "none");
+	$("#settingsForm").css("display", "none");
 	$("#ranquing").css("display", "none");
 	$("#login").css("display", "none");
 	$("#leave").css("display", "none");
@@ -99,6 +101,7 @@ function button_create() {
 	$("#register").css("display", "none");
 	$("#cuadroPartidaRapida").css("display", "none");
 	$("#instrucciones").css("display", "none");
+	$("#ranquingList").css("display", "none");
 	$("#container_instrucciones1").css("display", "none");
 	$("#container_instrucciones2").css("display", "none");
 	$("#container_instrucciones3").css("display", "none");
@@ -116,6 +119,7 @@ function button_lista_partidas() {
 	$("#registerForm").css("display", "none");
 	$("#loginForm").css("display", "none");
 	$("#settings").css("display", "none");
+	$("#settingsForm").css("display", "none");
 	$("#ranquing").css("display", "none");
 	$("#login").css("display", "none");
 	$("#leave").css("display", "none");
@@ -123,6 +127,7 @@ function button_lista_partidas() {
 	$("#register").css("display", "none");
 	$("#cuadroPartidaRapida").css("display", "none");
 	$("#instrucciones").css("display", "none");
+	$("#ranquingList").css("display", "none");
 	$("#container_instrucciones1").css("display", "none");
 	$("#container_instrucciones2").css("display", "none");
 	$("#container_instrucciones3").css("display", "none");
@@ -143,8 +148,9 @@ function backTo_InitMenu() {
 	$("#ranquing").css("display", "inline");
 	$("#cuadroFinPartida").css("display", "none");
 	$("#instrucciones").css("display", "inline");
+	$("#pauseButton").css("visibility", "hidden");
 	var logged = localStorage.getItem("logged");
-	console.log("backTo_InitMenu()->logged: "+logged);
+	//console.log("backTo_InitMenu()->logged: "+logged);
 	if (logged == "true") {
 		$("#leave").css("display", "inline");
 		$("#userNameContainer").css("display", "block");
@@ -159,7 +165,7 @@ function backTo_InitMenu() {
 }
 
 function button_loginForm () {
-	console.log("button_login()");
+	//console.log("button_login()");
 	if ($("#loginForm").css("display") == "block") {
 		$("#loginForm").css("display", "none");
 		$("#registerForm").css("display","none");
@@ -171,7 +177,7 @@ function button_loginForm () {
 }
 
 function button_registerForm () {
-	console.log("button_register()");
+	//console.log("button_register()");
 	//console.log("Display: "+$("#registerForm").css("display"));
 	if ($("#registerForm").css("display") == "block") {
 		$("#registerForm").css("display","none");
@@ -183,7 +189,7 @@ function button_registerForm () {
 }
 
 function button_leave () {
-	console.log("button_leave()");
+	//console.log("button_leave()");
 	$("#login").css("display", "block");
 	$("#register").css("display", "block");
 	$("#leave").css("display", "none");
@@ -195,7 +201,7 @@ function button_leave () {
 }
 
 function button_ranquing () {
-	console.log("button_ranquing()");
+	//console.log("button_ranquing()");
 	if ($("#ranquingList").css("display") == "block") {
 		$("#settingsForm").css("display","none");
 		$("#ranquingList").css("display", "none");
@@ -208,7 +214,7 @@ function button_ranquing () {
 }
 
 function button_settings () {
-	console.log("button_settings");
+	//console.log("button_settings");
 	if ($("#settingsForm").css("display") == "block") {
 		$("#settingsForm").css("display","none");
 		$("#ranquingList").css("display", "none");
@@ -221,7 +227,7 @@ function button_settings () {
 
 /** Interaccion con el servidor de los botones iniciales **/
 function form_login() {
-	console.log("form_login()")
+	//console.log("form_login()")
 	var loginName = document.form_login_user.loginName.value;
 	var loginPass = document.form_login_user.loginPass.value;
 	//Guardamos usuario y contraseña
@@ -235,7 +241,7 @@ function form_login() {
 }
 
 socket.on('login_user-OK', function(message) {
-	console.log("login_user-OK");
+	//console.log("login_user-OK");
 
 	//Borramos el formulario
 	document.getElementById("loginCorrection").innerHTML = "";
@@ -257,7 +263,7 @@ socket.on('login_user-KO', function(message) {
 	localStorage.removeItem('loginPass');
 	localStorage.setItem("logged", "false");
 
-	console.log("login_user-KO: "+message);
+	//console.log("login_user-KO: "+message);
 	document.getElementById("loginCorrection").innerHTML = "Usuario o contraseña incorrectos";
 	document.getElementById("userNameContainer").innerHTML = ""
 	document.form_login_user.loginName.value = "";
@@ -265,27 +271,27 @@ socket.on('login_user-KO', function(message) {
 });
 
 function form_register() {
-	console.log("form_register()");
+	//console.log("form_register()");
 	var registerName = document.form_register_user.registerName.value;
 	var registerPass1 = document.form_register_user.registerPass1.value;
 	var registerPass2 = document.form_register_user.registerPass2.value;
 
 	if (registerPass1 != registerPass2) {
-		console.log("Las contraseñas no coinciden");
+		//console.log("Las contraseñas no coinciden");
 		document.getElementById("registerCorrection").innerHTML = "Las contraseñas no coinciden";
 		document.form_register_user.registerPass1.value = "";
 		document.form_register_user.registerPass2.value = "";
 	} else if (registerName != "") {
 		socket.emit('register_user', {usuario: registerName, pass: registerPass1});
 	} else {
-		console.log('Usuario == ""');
+		//console.log('Usuario == ""');
 	}
 
 	return false;
 }
 
 socket.on('register_user-OK', function(message) {
-	console.log("register_user-OK");
+	//console.log("register_user-OK");
 	var loginName = document.form_register_user.registerName.value;
 	var loginPass = document.form_register_user.registerPass1.value;
 	document.form_login_user.loginName.value = loginName;
@@ -302,7 +308,7 @@ socket.on('register_user-OK', function(message) {
 });
 
 socket.on('register_user-KO', function(message) {
-	console.log("register_user-KO: "+message);
+	//console.log("register_user-KO: "+message);
 	document.getElementById("registerCorrection").innerHTML = "Usuario repetido";
 	//Quitar ya que si por mala conexion llegan peticiones retrasadas, el campo queda vacio.
 	//Por register_user-OK ya se gestionado todo
@@ -365,7 +371,7 @@ function mostrarInstrucciones(pagina) {
 }
 
 function form_settings() {
-	console.log("form_settings()");
+	//console.log("form_settings()");
 	ayudaDebil = document.form_settings_user.ayudaDebilName.checked;
 	localStorage.setItem('ayudaDebil', ayudaDebil);
 	//console.log("Ayuda Debil: "+ayudaDebil);
@@ -380,7 +386,7 @@ function form_settings() {
 }
 
 socket.on('create_ranquing', function(data) {
-	console.log("create_ranquing");
+	//console.log("create_ranquing");
 	//User fields
 	//	{"usuario": data.usuario,
 	//	"pass": data.pass,
@@ -396,7 +402,7 @@ socket.on('create_ranquing', function(data) {
 	$(".ranquingElems").remove();
 
 	var optionRanquing = localStorage.getItem('optionRanquing');
-	console.log("optionRanquing: "+ optionRanquing);
+	//console.log("optionRanquing: "+ optionRanquing);
 
 	var sortedObj = getUsersSorted(optionRanquing, data);
 	var maxLoop = (Object.keys(sortedObj)).length;
@@ -461,17 +467,17 @@ socket.on('create_game-KO', function() {
 })
 
 socket.on('new_player_joined', function() {
-	console.log("new_player_joined");
+	//console.log("new_player_joined");
 	actualizar_partidas();
 })
 
 socket.on('new_game_available', function() {
-	console.log("new_game_available");
+	//console.log("new_game_available");
 	actualizar_partidas();
 })
 
 socket.on('player_leaved', function() {
-	console.log("player_leaved");
+	//console.log("player_leaved");
 	actualizar_partidas();
 }); 
 
@@ -583,12 +589,13 @@ function joinPartida(idPartida , flag) {
 	} else {
 		socket.emit('join_game', {idPartida: idPartida, random: flag});
 		socket.on('join_game-OK', function(data) {
-			console.log("join_game-OK");
+			//console.log("join_game-OK");
 			idPartidaEsperando = data.idPartida;
 			enPartidaEsperando = true;
 			button_lista_partidas();
 		});
-		socket.on('join_game-KO', function(){
+		//Muy tricky. Con socket.once solo escuchamos el primer evento que llegue de ese tipo
+		socket.once('join_game-KO', function(){
 			//console.log("join_game-KO");
 			alert("Servidor alerta que no ha sido posible unirse a la partida. Intentalo de nuevo");
 			button_lista_partidas();
@@ -610,7 +617,7 @@ function leavePartida(idPartida) {
 		socket.on('leave_game-OK', function() {
 			idPartidaEsperando = "";
 			enPartidaEsperando = false;
-			console.log("leave_game-OK");
+			//console.log("leave_game-OK");
 			button_lista_partidas();
 		});
 		socket.on('leave_game-KO', function(){
@@ -626,12 +633,9 @@ function leavePartida(idPartida) {
 /** -------------------- **/
 
 /** Interaccion con el servidor de la partida **/
-function pausarJuego(){
-	console.log("Pausar juego");
-}
 
 socket.on('prepararPartida', function(datos_iniciales){
-	console.log("prepararPartida");
+	//console.log("prepararPartida");
 
 	idPartida = datos_iniciales.idPartida;
 	//No guardamos al usuario antes, no nos hace falta e igualmente debemos guardalo aqui si tenemos un idPartida
@@ -648,6 +652,7 @@ socket.on('prepararPartida', function(datos_iniciales){
 	Engine.initCubosDescarte();
 	Engine.initPosCartasUsuario();
 	Engine.initFinDescartesButton();
+	Engine.initPauseButton();
 
 	actualizarCanvasBG();
 
@@ -668,7 +673,6 @@ function esperarMovimiento(){
 			//console.log("Esperando movimiento");
 			esperarMovimiento();
 		} else {
-
 			if (movJugador == "tiempo_agotado") {
 				var newDatos_partida = {
 					idPartida: idPartida,
@@ -690,7 +694,8 @@ function esperarMovimiento(){
 					var data = {
 						idPartida: idPartida,
 						infoJugadores: infoJugadores,
-						ganador: infoJugadores[ganador].nombre
+						ganador: infoJugadores[ganador].nombre,
+						organosJugadoresCli: organosJugadoresCli
 					}
 					socket.emit('terminarPartida', data);
 				} else {
@@ -706,6 +711,7 @@ function esperarMovimiento(){
 						organosJugadoresCli: organosJugadoresCli,
 						movJugador: movJugador
 					};
+					cerrarAyudaCartas();
 					socket.emit('siguienteTurnoSrv', newDatos_partida);
 				}
 			}
@@ -719,12 +725,12 @@ function comunicarTiempoAgotado () {
 		turno: turno,
 		numTurno: numTurno
 	}
-	console.log("Avisamos al servidor que puede haber un jugador inactivo");
+	//console.log("Avisamos al servidor que puede haber un jugador inactivo");
 	socket.emit('tiempo_agotado', datos);
 }
 
 socket.on('tiempo_agotadoOK', function() {
-	console.log("Servidor ha recibido correctamente el turno perdido. Retransmitimos avanzar turno");
+	//console.log("Servidor ha recibido correctamente el turno perdido. Retransmitimos avanzar turno");
 	//Avanzamos turno - NO -> En principio ya avanzamos turno en el servidor
 	/**var index = jugadores.indexOf(turno);
 	if (index < (jugadores.length -1)) {
@@ -806,8 +812,9 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 	//Si el anterior jugador ha perdido el turno, llegaran uno o varios mensajes
 	//Usamos el primero y saltamos el resto
 	//Si el turno que teniamos guardado, es igual al turno que nos llega es que el turno ya ha sido procesado
+	//Si hubiera problemas, subir mas arriba esta instruccion turno = datos_partida.turno;
 	if (turno == datos_partida.turno) {
-		console.log("Mensajes retrasados de pierde turno");
+		//console.log("Mensajes retrasados de pierde turno");
 		return;
 	}
 
@@ -824,7 +831,7 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 
 	//Guante de Latex
 	//El jugador de la carta no se descarta
-	if ((movJugador == "guante_de_latex") && (usuario != turno)) {
+	if ((movJugador == "guanteDeLatex") && (usuario != turno)) {
 		objetos[0].src = "";
 		objetos[1].src = "";
 		objetos[2].src = "";
@@ -851,7 +858,7 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 
 	//Compruebo si me han echado de la partida
 	if (jugadores.indexOf(usuario) == -1) {
-		console.log("Hemos sido expulsado de la partida");
+		//console.log("Hemos sido expulsados de la partida");
 		backTo_InitMenu();
 		return;
 	}
@@ -874,9 +881,42 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 	checkCards();
 	indicarTurno(turno);
 
+	//Conforman el hilo de ejecucion del turno del usuario
 	esperarMovimiento(); //->setTimeOut
 	renderCountDown(30, new Date()); //->setTimeOut
 });
+
+function pauseGame(){
+	console.log("pauseGame()");
+	var datos_partida = {
+		idPartida: idPartida
+	};
+
+	if (gamePaused == "false") {
+		socket.emit('pauseGame', datos_partida);
+	} else if (gamePaused == "true") {
+		socket.emit('continueGame', datos_partida);
+
+	}
+}
+
+socket.on('pauseGame', function(datos_partida) {
+	//console.log("socket.on->pauseGame");
+	gamePaused = "true";
+	//Cambiamos color
+	$("#pauseButton").css("background-color","red");
+	clearTimeout(countDownSTO); //->setTimeOut
+	clearTimeout(esperarMovSTO); //->setTimeOut
+})
+
+socket.on('contineGame', function(datos_partida) {
+	//console.log("socket.on->continueGame");	
+	gamePaused = "false";
+	//Cambiamos color
+	$("#pauseButton").css("background-color","green");
+	esperarMovimiento(); //->setTimeOut
+	renderCountDown(30, new Date()); //->setTimeOut
+})
 
 function representarMov(movJugador) {
 
@@ -891,12 +931,25 @@ function checkCards() {
 }
 
 socket.on('terminarPartida', function(data){
+	//Dibujamos organos por ultima vez
+	if (data.organosJugadoresCli != undefined){
+		for (var jugador in data.organosJugadoresCli){
+			organosJugadoresCli[jugador].cerebro = data.organosJugadoresCli[jugador].cerebro;
+			organosJugadoresCli[jugador].corazon = data.organosJugadoresCli[jugador].corazon;
+			organosJugadoresCli[jugador].higado = data.organosJugadoresCli[jugador].higado
+			organosJugadoresCli[jugador].hueso = data.organosJugadoresCli[jugador].hueso;
+			organosJugadoresCli[jugador].organoComodin = data.organosJugadoresCli[jugador].organoComodin;
+		}
+	}
+	cerrarAyudaCartas();
+	actualizarCanvasMID();
+
 	//Reseteamos cosas
 	clearTimeout(countDownSTO);
 	clearTimeout(esperarMovSTO);
 
-	console.log("Terminar Partida");
-	console.log("Ganador: "+data.ganador);
+	//console.log("Terminar Partida");
+	//console.log("Ganador: "+data.ganador);
 
 	var widthElem = parseInt(($("#cuadroFinPartida").css("width")).replace("px",""));
 	var heightElem = parseInt(($("#cuadroFinPartida").css("height")).replace("px",""));
@@ -918,6 +971,7 @@ socket.on('terminarPartida', function(data){
 	$("#cuadroFinPartida").css("top", posYStr);
 
 	document.getElementById("jugadorFinPartida").innerHTML = data.ganador;
+	$("#pauseButton").css("visibility", "hidden");
 	$("#cuadroFinPartida").css("display", "block");
 })
 /** -------------------- **/

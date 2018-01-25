@@ -15,6 +15,15 @@
 	<script src="js/game.js"></script>
 	<script src="js/cliente.js"></script>
 
+	<script language=javascript type=text/javascript>
+		function stopRKey(evt) {
+		   var evt = (evt) ? evt : ((event) ? event : null);
+		   var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
+		   if ((evt.keyCode == 13) && (node.type=="text")) {return false;}
+		   if ((evt.keyCode == 13) && (node.type=="password")) {return false;}
+		}
+		document.onkeypress = stopRKey;
+	</script>
 </head>
 
 <body>
@@ -53,19 +62,19 @@
 
 	<div id="settingsForm" style="display: none;">
 		<form name="form_settings_user" onsubmit="return form_settings()"/>
-			<label class="label_form1 tittle_settings">Settings</label>
-			<label class="label_form1">Activar ayuda debil</label>
+			<label class="label_form1 tittle_settings">Ajustes</label>
+			<label class="label_form1">Activar ayuda débil</label>
 			<label class="label_form1 switch">
 			  	<input type="checkbox" name="ayudaDebilName" checked>
 			  	<span class="slider round"></span>
 			</label>
-			<label class="label_form2">Ayuda sobre todo a usar las cartas especiales. Se recomiendo dejar activado</label>
+			<label class="label_form2">Ayuda a usar las cartas especiales. Se recomienda dejar activado</label>
 			<label class="label_form1">Activar ayuda fuerte</label>
 			<label class="label_form1 switch">
 			  	<input type="checkbox" name="ayudaFuerteName" checked>
 			  	<span class="slider round"></span>
 			</label>
-			<label class="label_form2">Consiste en cuadros de ayuda explicando el funcionamiento de la mayoria de las funcionalidades del juego</label>
+			<label class="label_form2">Da información, de menor relevancia, sobre otros aspectos del juego</label>
 			<label class="label_form1">Recordar jugador</label>
 			<label class="label_form1 switch">
 			  	<input type="checkbox" name="autoLoginName" checked>
@@ -109,17 +118,17 @@
 			        <option value="3">3</option>
 			        <option value="4">4</option>
 			        <option value="5">5</option>
-			        <option value="6">6</option>
+			        <!--<option value="6">6</option>-->
 			        </select>
 			    </li>
-			    <input class="boton" value="BACK" onclick="backTo_InitMenu() " readonly="readonly"/>
+			    <input class="boton" value="Volver" onclick="backTo_InitMenu() " readonly="readonly"/>
 			    <input class="boton botonCrearPartida" type="submit" value="Crear partida" readonly="readonly"/>
 			</ul>
 		</form>
 	</div>
 
 	<div id="lista_partidas" style="display: none;">
-		<input class="boton backBotonListaPartidas" value="BACK" onclick="backTo_InitMenu()" readonly="readonly"/>
+		<input class="boton backBotonListaPartidas" value="Volver" onclick="backTo_InitMenu()" readonly="readonly"/>
 		
 		<ul id="container_partidas">
 			<!--<li class="partida">
@@ -135,8 +144,8 @@
 	<div id="cuadroPartidaRapida" style="display: none;">
 		<a class="notaEncabezado">(Juega en la partida con más posibilidades de empezar antes)</a>
 		<a class="tituloCartaIzq">Actualmente:</a>
-		<a id="partidaRapidaNombre">-Partida: Partida de Perry maison</a>
-		<a id="partidaRapidaJugadores">-(Necesarios 2 jugadores)</a>
+		<a id="partidaRapidaNombre">No hay partidas disponibles</a>
+		<a id="partidaRapidaJugadores">-------------</a>
 	</div>
 
 	<div id=cuadroFinPartida style="display: none;">
@@ -146,21 +155,53 @@
 		<input class="boton" id="botonFinPartida" value="VOLVER A LA PANTALLA PRINCIPAL" onclick="backTo_InitMenu()" readonly="readonly"/>
 	</div>
 
-	<div id="ayudaError_medico" style="display: none"; class="ayudaDebil">
+	<div id="ayudaErrorMedico" style="visibility: hidden";">
+		<img id="iconoOrgano" src="img/cardImagesLQ/especiales/errorMedico.png" />
+		<h1 class=tituloEnumInstrucciones>
+			<span class="tittleSeccion1">Carta especial: Error médico</span></br>
+		</h1>
+		<h2 class="resaltadoEnumInstrucciones">
+			Arrastra la carta sobre cualquier recuadro de órganos de un rival.
+		</h2>
+
+		<p class="textoEnumInstrucciones">
+			¡Se trata de un cambio de cuerpo completo! Intercambia todos tus órganos por los órganos del jugador elegido independientemente de su estado. Esto incluye órganos <b>inmunizados</b>.
+		</p>
 	</div>
 
-	<div id="ayudaGuante_de_latex" style="display: none"; class="ayudaDebil">
+	<div id="ayudaGuanteDeLatex" style="visibility: hidden;">
+		<img id="iconoOrgano" src="img/cardImagesLQ/especiales/guanteDeLatex.png" />
+		<h1 class=tituloEnumInstrucciones>
+			<span class="tittleSeccion1">Carta especial: Guante de Latex</span></br>
+		</h1>
+		<h2 class="resaltadoEnumInstrucciones">
+			Arrastra la carta sobre cualquiera de los recuadros de órganos, tuyos o de un rival
+		</h2>
+
+		<p class="textoEnumInstrucciones">
+			Todos los jugadores, a excepción de ti, descartan su mano automáticamente. Ten en cuenta, que si no tienen cartas en la mano, perderán su turno robando cartas nuevas.
+		</p>
 	</div>
 
-	<div id="ayudaTransplante" style="display: none;" class=".ayudaDebil">
-		<div id="ayudaTransplanteParteSup">
-			<div class="iconoCartaEspecial">
-			</div>
-			<div class="textoCartaEspecial">
-				<a class="tituloTextoCartaEspecial">TRANSPLANTE<br></a>
-				<b>Intercambia</b> un órgano por otro entre dos jugadores cualesquiera. No importa si el color de estos órganos es diferente, ni si están sanos, infectados o vacunados. Sencillamente el jugador cambia el órgano escogido por otro, siempre y cuando ninguno de los dos jugadores tenga dos órganos del mismo color ni éstos estén inmunizados.
-			</div>
-		</div>
+	<div id="ayudaTransplante" style="visibility: hidden;">
+		<img id="iconoOrgano" src="img/cardImagesLQ/especiales/transplante.png" />
+		<h1 class=tituloEnumInstrucciones>
+			<span class="tittleSeccion1">Carta especial: Transplante</span></br>
+		</h1>
+		<h2 class="resaltadoEnumInstrucciones">
+			Arrastra la carta sobre un órgano de un jugador cualquiera, y vuélvela a arrastrar sobre otro órgano.
+		</h2>
+
+		<p class="textoEnumInstrucciones">
+			Intercambia un órgano por otro. No importa si los órganos son diferentes o si están sanos, infectados o vacunados.
+		</p>
+		<p class="textoEnumInstrucciones">
+			<b>Normas:</b></br>
+			<b>1.- </b>No puedes intercambiar órganos inmunizados.</br>
+			<b>2.- </b>No pueden transplantarse órganos que ya se tienen.</br>
+			<b>3.- </b>Si el cambio es ilegal, aparecerán los dos órganos para que puedas rectificar.</br>
+		</p>
+
 		<div id="ayudaTransplanteParteInf">
 			<div class="cartaIzq" onclick="removeOrgano1Transplante()">
 				<div class="tituloCartaIzq">Órgano 1</div>
@@ -174,27 +215,51 @@
 		<div id="ayudaTransplantePie">(Toca en un recuadro superior para eliminar la seleccion)</div>
 	</div>
 
-	<div id="ayudaLadron_de_organos" style="display: none"; class="ayudaDebil">
+	<div id="ayudaLadronDeOrganos" style="visibility: hidden;">
+		<img id="iconoOrgano" src="img/cardImagesLQ/especiales/ladronDeOrganos.png" />
+		<h1 class=tituloEnumInstrucciones>
+			<span class="tittleSeccion1">Carta especial: LADRÓN DE ÓRGANOS</span></br>
+		</h1>
+		<h2 class="resaltadoEnumInstrucciones">
+			Simplemente arrastra la carta sobre el órgano que quieras robar
+		</h2>
+
+		<p class="textoEnumInstrucciones">
+			<b>Normas:</b></br>
+			<b>1.- </b>No puedes robar un órgano si ya lo tienes</br>
+			<b>2.- </b>Los órganos inmunizados <b>NO</b> se pueden robar</br>
+			<b>3.- </b>Cuando robas el órgano, también robas las medicinas y virus que estén sobre él.</br>
+		</p>
 	</div>
 
 	<div id="ayudaContagio" style="display: none"; class="ayudaDebil">
 	</div>
 
+	<div id="ayudaDescartes" style="visibility: hidden;">
+		<h2 class="resaltadoEnumInstrucciones">
+			Descarte en proceso...
+		</h2>
+
+		<p class="textoEnumInstrucciones">
+			Sigue arrastrando ninguna o el resto de las cartas de tu mano a la zona de descarte, en el medio del tablero, y pulsa el botón <b>"Fin descarte"</b> para finalizar el turno.</br>
+		</p>
+	</div>
+
 	<div id="canvas_container" style="position: relative; display: none;">
 		<canvas id="canvas" width="1000px" height="700px"
-				style="position: absolute; left: 0; top: 0; z-index: 6;">
+				style="position: absolute; left: 0; top: 0; z-index: 20;">
 			Your browser does not support canvas
 		</canvas>
 		<canvas id="canvasAPO" width="1000px" height="700px"
-				style="position: absolute; left: 0; top: 0; z-index: 5;">
+				style="position: absolute; left: 0; top: 0; z-index: 15;">
 			Your browser does not support canvas
 		</canvas>
 		<canvas id="canvasMID" width="1000px" height="700px"
-				style="position: absolute; left: 0; top: 0; z-index: 4;">
+				style="position: absolute; left: 0; top: 0; z-index: 10;">
 			Your browser does not support canvas
 		</canvas>
 		<canvas id="canvasBG" width="1000px" height="700px"
-				style="position: absolute; left: 0; top: 0; z-index: 3;">
+				style="position: absolute; left: 0; top: 0; z-index: 5;">
 			Your browser does not support canvas
 		</canvas>
 	</div>
@@ -375,7 +440,7 @@
 			<img class="iconoEnumInstrucciones" src="css/img/iconosEspeciales/iconoTransplante.png" />
 			<span class="tittleSeccion2">TRANSPLANTE</span></br>
 			<span class="textoSeccion2">
-				<b>Intercambia</b> un órgano por otro entre dos jugadores cualesquiera. No importa si el color de los órganos es diferente, ni si están sanos, infectados o vacunados. Sencillamente el jugador cambia el órgano escogido por otro, siempre y cuando ninguno de los dos jugadpres tenga dos órganos del mismo colo ni estos estén inmunizados.</br>
+				<b>Intercambia</b> un órgano por otro entre dos jugadores cualesquiera. No importa si el color de los órganos es diferente, ni si están sanos, infectados o vacunados. Sencillamente el jugador cambia el órgano escogido por otro, siempre y cuando ninguno de los dos jugadores tenga dos órganos del mismo color ni estos estén inmunizados.</br>
 			</span>
 		</p>
 
@@ -417,9 +482,9 @@
 			<div class="numPagInstrucciones">5/5</div>
 			<div class="instruccionesNext" style="visibility: hidden;">Siguiente</div>
 		</div>
+	</div>
 
-		<!--<div id=pauseButton>
-		</div>-->
+	<div id=pauseButton onclick="pauseGame()">
 	</div>
 
 </body>

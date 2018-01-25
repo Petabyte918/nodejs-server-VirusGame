@@ -110,7 +110,7 @@ function degToRad(degree) {
 function renderCountDown(time, oldDate){
 	//console.log("renderCountDown()");
 	var radius = 30;
-	var xCountDown = posCubosDescarte[1].x -radius;
+	var xCountDown = posCubosDescarte[1].x - radius;
 	var yCountDown = posCubosDescarte[1].y + radius*6;
 
 	//Cada vez que cambiemos el tiempo del cronometro hay que ajustar el valor
@@ -198,7 +198,7 @@ function renderCountDown(time, oldDate){
 		if (time > 0) {
 			renderCountDown(time, now);
 		} else {
-			console.log("renderCountDown: el tiempo ha llegado a cero");
+			//console.log("renderCountDown: el tiempo ha llegado a cero");
 			//Y nos chivamos al servidor
 			comunicarTiempoAgotado();
 			//Por si se nos ha pasado el tiempo en medio de un descarte
@@ -412,6 +412,7 @@ function renderOrgano(posOrgano, estadoOrgano) {
 	var widthOrgano = posOrgano.width;
 	var heightOrgano = posOrgano.height;
 	var src = posOrgano.src;
+	var posJug = posOrgano.posJug;
 
 	//Estado organos: vacio, normal, enfermo, vacunado, inmunizado
 	//Marco negro en fondo blanco
@@ -423,7 +424,7 @@ function renderOrgano(posOrgano, estadoOrgano) {
 
 	}
 
-	//Marco negro en fondo blanco y encima la imagen
+	//Marco negro (en fondo blanco) y encima la imagen->como va la imagen encima no es necesario el fondo blanco
 	if(estadoOrgano == "normal"){
 		cxMID.fillStyle = 'black';
 		cxMID.fillRect(x-5, y-5, widthOrgano+10, heightOrgano+10);
@@ -431,9 +432,21 @@ function renderOrgano(posOrgano, estadoOrgano) {
 		cxMID.fillRect(x, y, widthOrgano, heightOrgano);**/
 		var img1 = new Image();
 		img1.src = src;
-		img1.onload = function(){
-			//console.log("objetos[0] :"+objetos[0]);
-			cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+		//Si dibujamos en pos 2 tenemos que rotar el canvas para dibujar la imagen girada
+		if (posJug == 2) {
+			img1.onload = function(){
+				//console.log("objetos[0] :"+objetos[0]);
+				cxMID.save();
+				cxMID.translate(x, y);
+				cxMID.translate(widthOrgano, 0);
+				cxMID.rotate(Math.PI/2);
+				cxMID.drawImage(img1, 0, 0, heightOrgano, widthOrgano); //Ojo que invertimos dimensiones
+				cxMID.restore();
+			}
+		} else {
+			img1.onload = function(){
+				cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+			}
 		}
 	}
 
@@ -445,9 +458,21 @@ function renderOrgano(posOrgano, estadoOrgano) {
 		cxMID.fillRect(x, y, widthOrgano, heightOrgano);**/
 		var img1 = new Image();
 		img1.src = src;
-		img1.onload = function(){
-			//console.log("objetos[0] :"+objetos[0]);
-			cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+		//Si dibujamos en pos 2 tenemos que rotar el canvas para dibujar la imagen girada
+		if (posJug == 2) {
+			img1.onload = function(){
+				//console.log("objetos[0] :"+objetos[0]);
+				cxMID.save();
+				cxMID.translate(x, y);
+				cxMID.translate(widthOrgano, 0);
+				cxMID.rotate(Math.PI/2);
+				cxMID.drawImage(img1, 0, 0, heightOrgano, widthOrgano); //Ojo que invertimos dimensiones
+				cxMID.restore();
+			}
+		} else {
+			img1.onload = function(){
+				cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+			}
 		}
 	}
 
@@ -459,9 +484,21 @@ function renderOrgano(posOrgano, estadoOrgano) {
 		cxMID.fillRect(x, y, widthOrgano, heightOrgano);**/
 		var img1 = new Image();
 		img1.src = src;
-		img1.onload = function(){
-			//console.log("objetos[0] :"+objetos[0]);
-			cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+		//Si dibujamos en pos 2 tenemos que rotar el canvas para dibujar la imagen girada
+		if (posJug == 2) {
+			img1.onload = function(){
+				//console.log("objetos[0] :"+objetos[0]);
+				cxMID.save();
+				cxMID.translate(x, y);
+				cxMID.translate(widthOrgano, 0);
+				cxMID.rotate(Math.PI/2);
+				cxMID.drawImage(img1, 0, 0, heightOrgano, widthOrgano); //Ojo que invertimos dimensiones
+				cxMID.restore();
+			}
+		} else {
+			img1.onload = function(){
+				cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+			}
 		}
 	}
 
@@ -473,16 +510,41 @@ function renderOrgano(posOrgano, estadoOrgano) {
 		cxMID.fillRect(x, y, widthOrgano, heightOrgano);**/
 		var img1 = new Image();
 		img1.src = src;
-		img1.onload = function(){
-			//console.log("objetos[0] :"+objetos[0]);
-			cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+		//Si dibujamos en pos 2 tenemos que rotar el canvas para dibujar la imagen girada
+		if (posJug == 2) {
+			img1.onload = function(){
+				//console.log("objetos[0] :"+objetos[0]);
+				cxMID.save();
+				cxMID.translate(x, y);
+				cxMID.translate(widthOrgano, 0);
+				cxMID.rotate(Math.PI/2);
+				cxMID.drawImage(img1, 0, 0, heightOrgano, widthOrgano); //Ojo que invertimos dimensiones
+				cxMID.restore();
+			}
 			var img2 = new Image();
 			img2.src = "img/cardImagesLQ/cadenas.png";
 			img2.onload = function(){
+				cxMID.save();
+				cxMID.translate(x, y);
+				cxMID.translate(widthOrgano, 0);
+				cxMID.rotate(Math.PI/2);
+				cxMID.drawImage(img2, -5, -5, heightOrgano+10, widthOrgano+10);
+				cxMID.restore();
+			}
+		} else {
+			img1.onload = function(){
 				//console.log("objetos[0] :"+objetos[0]);
-				cxMID.drawImage(img2, x-5, y-5, widthOrgano+10, heightOrgano+10);
+				cxMID.drawImage(img1, x, y, widthOrgano, heightOrgano);
+				var img2 = new Image();
+				img2.src = "img/cardImagesLQ/cadenas.png";
+				img2.onload = function(){
+					//console.log("objetos[0] :"+objetos[0]);
+					cxMID.drawImage(img2, x-5, y-5, widthOrgano+10, heightOrgano+10);
+				}
 			}
 		}
+
+
 		/**
 		cxMID.globalAlpha = 0.2;
 		cxMID.fillStyle = 'blue';
@@ -492,12 +554,12 @@ function renderOrgano(posOrgano, estadoOrgano) {
 	}
 }
 
-function renderOrganosTransplante () {
+function renderOrganosTransplante() {
 	//Redimensionamos en relacion al tamaño de la carta
 	var heightCard = ($(".imagenCartaIzq").css("height")).replace("px","");;
 	var widthCard = (heightCard * (1013/1536)) + "px";
-	console.log("heightCard: "+heightCard);
-	console.log("widthCard: "+widthCard);
+	//console.log("heightCard: "+heightCard);
+	//console.log("widthCard: "+widthCard);
 
 	$(".imagenCartaIzq").css("width", widthCard);
 	$(".imagenCartaDcha").css("width", widthCard);
@@ -537,6 +599,9 @@ function renderOrganosTransplante () {
 			$(".imagenCartaDcha").css("background-image", "");
 			break;
 		}
+	} else {
+		$(".imagenCartaIzq").css("background-image", "");
+		$(".imagenCartaDcha").css("background-image", "");				
 	}
 }
 
@@ -581,7 +646,7 @@ function actualizarCanvas(){
 	if ((objetos[0].src != "") && (descartes[0] == false)){
 		//Tratamos de evitar parpadeos moviendo cartas
 		if (objetos[0] == objetoActual) {
-			console.log("Objeto 1 es el objeto actual");
+			//console.log("Objeto 1 es el objeto actual");
 		} else {
 			img1.src = objetos[0].src;
 			img1.onload = function(){
@@ -594,7 +659,7 @@ function actualizarCanvas(){
 	if ((objetos[1].src != "") && (descartes[1] == false)){
 		//Tratamos de evitar parpadeos moviendo cartas
 		if (objetos[1] == objetoActual) {
-			console.log("Objeto 2 es el objeto actual");
+			//console.log("Objeto 2 es el objeto actual");
 		} else {
 			img2.src = objetos[1].src;
 			img2.onload = function(){
@@ -607,7 +672,7 @@ function actualizarCanvas(){
 	if ((objetos[2].src != "") && (descartes[2] == false)){
 		//Tratamos de evitar parpadeos moviendo cartas
 		if (objetos[2] == objetoActual) {
-			console.log("Objeto 3 es el objeto actual");
+			//console.log("Objeto 3 es el objeto actual");
 		} else {
 			img3.src = objetos[2].src;
 			img3.onload = function(){
@@ -959,13 +1024,14 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 	//Descarte
 	if (posDestino == 0) {
 		finDescarte = false;
+		abrirAyudaCartas("ayudaDescartes");
 		descartes[numCarta] = true;
 		actualizarCanvas();
 		$("#descartes_boton").css("display","inline");
 	}
 	//Descarte-block. Si estamos en proceso de descarte no podemos hacer otra cosa hasta acabar
 	if (finDescarte == false) {
-		console.log("Descarte en proceso");
+		//console.log("Descarte en proceso");
 		return;
 	}
 
@@ -989,7 +1055,7 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 			organosJugadoresCli[jugDestino][organType] = "normal";
 			movJugador = "algo";
 		} else {
-			console.log("manejadorMov() - Organo repetido");
+			//console.log("manejadorMov() - Organo repetido");
 		}
 	}
 
@@ -1011,7 +1077,7 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 				organosJugadoresCli[jugDestino][organoColision] = "inmunizado";
 				movJugador = "algo";
 			} else {
-				console.log("manejadorMov() - Medicina. Organo inmunizado o no existe");
+				//console.log("manejadorMov() - Medicina. Organo inmunizado o no existe");
 			}
 		}
 			
@@ -1027,7 +1093,7 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 				organosJugadoresCli[jugDestino][organoColision] = "normal";
 				movJugador = "algo";
 			} else {
-				console.log("manejadorMov() - Virus. Organo inmunizado o no existe");
+				//console.log("manejadorMov() - Virus. Organo inmunizado o no existe");
 			}
 		}
 	}
@@ -1035,7 +1101,7 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 	if (cardType == "tratamiento") {
 		//Estado organos: vacio, normal, enfermo, vacunado, inmunizado
 		switch (organType) {
-		case "error_medico":
+		case "errorMedico":
 			console.log("manejadorMov() - Error medico");
 			var auxCerebro = organosJugadoresCli[jugDestino].cerebro;
 			var auxCorazon = organosJugadoresCli[jugDestino].corazon;
@@ -1055,9 +1121,9 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 
 			movJugador = "algo";
 			break;
-		case "guante_de_latex":
+		case "guanteDeLatex":
 			console.log("manejadorMov() - Guante de latex");
-			movJugador = "guante_de_latex";
+			movJugador = "guanteDeLatex";
 			break;
 		case "transplante":
 			console.log("manejadorMov() - Transplante");
@@ -1117,7 +1183,7 @@ function manejadorMov(posDestino, organoColision, numCarta) {
 				}
 			}
 			break;
-		case "ladron_de_organos":
+		case "ladronDeOrganos":
 			console.log("manejadorMov() - Ladron de organos");
 			//Si no tengo el organo destino y se puede lo robo
 			if (organosJugadoresCli[usuario][organoColision] == "") {
@@ -1176,6 +1242,7 @@ function fin_transplante() {
 	transplante.organo1.numJug = -1;
 	transplante.organo2.organo = "";
 	transplante.organo2.numJug = -1;
+	renderOrganosTransplante();
 }
 
 function reDimPartidaRapida() {
@@ -1211,7 +1278,7 @@ function reDimRanquingList() {
 
 	console.log("windowWidth: "+windowWidth);
 
-	var widthRanquingList = (Math.floor(windowWidth - (posBotonJug.left + posBotonJug.width) - 40)).toString() + "px";
+	var widthRanquingList = (Math.floor(windowWidth - posBotonJug.right - 15)).toString() + "px";
 
 	$("#ranquingList").css("width", widthRanquingList);
 }
@@ -1276,8 +1343,61 @@ function reDimContainer_instrucciones(pagina) {
 	}
 }
 
+function reDimAyudaCartaEspecial(cartaEspecial) {
+	console.log("reDimAyudaCartaEspecial()");
+
+	//Esto siendo estrictos no deberia ir aqui, pero no quiero ponerme a cambiar nombres Ej.:ayudaTransplante por ayudatransplante
+	//No es muy hacky
+	//Rectifico. lo estoy escondiendo pero al salir de la funcion lo hago visible. Hay que hacerlo desde la funcion anterior
+	//haciendo bien el cambio de nombres
+	/**if (cartaEspecial != "ayudaDescartes") {
+		var visibility = $("#"+cartaEspecial).css("visibility");
+		if (visibility == "visible") {
+			$("#"+cartaEspecial).css("visibility", "hidden");
+			return;
+		}
+	}**/
+
+	/**
+	posOrganosJugadores[1] = {
+		widthOrgano: widthOrgano,
+		heightOrgano:heightOrgano,
+		posCerebro: posCerebro,
+		posCorazon: posCorazon,
+		posHueso: posHueso,
+		posHigado: posHigado,
+		posComodin: posComodin
+	};**/
+	var marginIzqDcha = 40;
+	var marginBottom = 15;
+	var posXNum = Math.floor(posOrganosJugadores[1].widthOrgano + posOrganosJugadores[1].posComodin[0] + marginIzqDcha);
+	var posX = (Math.floor(posOrganosJugadores[1].widthOrgano + posOrganosJugadores[1].posComodin[0] + marginIzqDcha)).toString() + "px";
+	var width = (Math.floor(windowWidth - posXNum - marginIzqDcha - 10)).toString() + "px";
+
+	var height = "auto";
+
+	//console.log("posXNum: "+posXNum+" - posX: "+posX);
+	//console.log("width: "+width);
+	//console.log("height: "+height);
+
+	$("#"+cartaEspecial).css("left", posX);
+	$("#"+cartaEspecial).css("width", width);
+	$("#"+cartaEspecial).css("height", height);
+
+	var elemAyudaLadronDeOrganos = document.getElementById(cartaEspecial);
+	var posAyudaLadronDeOrganos = elemAyudaLadronDeOrganos.getBoundingClientRect();
+
+	var top = (Math.floor(windowHeight - posAyudaLadronDeOrganos.height - marginBottom)).toString() + "px";
+
+	//console.log("bottom: "+top);
+
+	$("#"+cartaEspecial).css("top", top);
+
+
+}
+
 function doneResizing() {
-	console.log("Pantalla modificada");
+	console.log("doneResizing()");
 	windowWidth = window.innerWidth;
 	windowHeight = window.innerHeight;
 	
