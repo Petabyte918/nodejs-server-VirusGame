@@ -27,6 +27,10 @@
 </head>
 
 <body>
+	<div id="container_loading">
+		<div id="loading"></div>
+	</div>
+	
 	<div id="settings" onclick="button_settings()"></div>
 	<div id="ranquing" onclick="button_ranquing()"></div>
 	<div id="login" onclick="button_loginForm()">Iniciar Sesion</div>
@@ -84,7 +88,7 @@
 		</form>
 	</div>
 
-	<div id="ranquingList" style="display: none;">
+	<div id="ranquingList" style="visibility: hidden;">
 		<div class="ranquingIndices ranquingLine">
 			<a id="ranquingPos" class="ranquingPos">Pos</a>
 			<a id="ranquingUsuario" class="ranquingUsuario">Usuario</a>
@@ -100,7 +104,7 @@
 		<a class="boton" id="boton_lista" title="Lista de partidas" onclick="button_lista_partidas()">Lista de partidas</a>
 	</div>
 
-	<div id="descartes_boton" style="display: none;">
+	<div id="descartes_boton" style="visibility: hidden;">
 		<a class="boton" id="fin_descartes" title="fin_descarte" onclick="fin_descarte()">Fin Descarte</a>
 	</div>
 
@@ -131,13 +135,6 @@
 		<input class="boton backBotonListaPartidas" value="Volver" onclick="backTo_InitMenu()" readonly="readonly"/>
 		
 		<ul id="container_partidas">
-			<!--<li class="partida">
-				<a class="nombre_partida">Nombre partida: nombre de la partida</a>
-				<a class="nombre_creador>"></a>
-				<a class="join_partida">ENTRAR</a>
-				<a class="leave_partida">SALIR</a>
-				<a class="num_jugadores">4 / 6</a>
-			</li>-->
 		</ul>
 	</div>
 
@@ -150,7 +147,7 @@
 
 	<div id=cuadroFinPartida style="display: none;">
 		<h1>Fin de la Partida</h1>
-		<h2>Ha ganado el jugador</br></h2>
+		<h2 id="cartelFinPartida">Ha ganado el jugador</br></h2>
 		<h3 id="jugadorFinPartida"></h3>
 		<input class="boton" id="botonFinPartida" value="VOLVER A LA PANTALLA PRINCIPAL" onclick="backTo_InitMenu()" readonly="readonly"/>
 	</div>
@@ -189,30 +186,32 @@
 			<span class="tittleSeccion1">Carta especial: Transplante</span></br>
 		</h1>
 		<h2 class="resaltadoEnumInstrucciones">
-			Arrastra la carta sobre un órgano de un jugador cualquiera, y vuélvela a arrastrar sobre otro órgano.
+			Arrastra la carta sobre dos órganos diferentes.
 		</h2>
 
 		<p class="textoEnumInstrucciones">
-			Intercambia un órgano por otro. No importa si los órganos son diferentes o si están sanos, infectados o vacunados.
+			Intercambia un órgano por otro.
 		</p>
 		<p class="textoEnumInstrucciones">
 			<b>Normas:</b></br>
 			<b>1.- </b>No puedes intercambiar órganos inmunizados.</br>
 			<b>2.- </b>No pueden transplantarse órganos que ya se tienen.</br>
-			<b>3.- </b>Si el cambio es ilegal, aparecerán los dos órganos para que puedas rectificar.</br>
 		</p>
 
 		<div id="ayudaTransplanteParteInf">
-			<div class="cartaIzq" onclick="removeOrgano1Transplante()">
+			<div id="cartaIzq" onclick="removeOrgano1Transplante()">
 				<div class="tituloCartaIzq">Órgano 1</div>
 				<div class="imagenCartaIzq"></div>
 			</div>
-			<div class="cartaDcha" onclick="removeOrgano2Transplante()">
+			<div id="okButtonTransplante">
+			</div>
+			<div id="cartaDcha" onclick="removeOrgano2Transplante()">
 				<div class="tituloCartaDcha">Órgano 2</div>
 				<div class="imagenCartaDcha"></div>
 			</div>
 		</div>
 		<div id="ayudaTransplantePie">(Toca en un recuadro superior para eliminar la seleccion)</div>
+		<div id="correcionTransplante"></div>
 	</div>
 
 	<div id="ayudaLadronDeOrganos" style="visibility: hidden;">
@@ -241,7 +240,7 @@
 		</h2>
 
 		<p class="textoEnumInstrucciones">
-			Sigue arrastrando ninguna o el resto de las cartas de tu mano a la zona de descarte, en el medio del tablero, y pulsa el botón <b>"Fin descarte"</b> para finalizar el turno.</br>
+			Sigue arrastrando ninguna o el resto de las cartas de la mano a la zona de descarte, en el medio del tablero, y pulsa el botón <b>"Fin descarte"</b> para finalizar el turno.</br>
 		</p>
 	</div>
 
@@ -283,12 +282,12 @@
 		</h2>
 
 		<p class="textoEnumInstrucciones">
-		<b>1.- </b>Hay 4 tipos de cartas diferentes: órganos, virus, medicinas y <b>cartas especiales</b> de tratamiento.</br>
-		<b>2.- </b>Para usar las cartas de tu mano, ¡simplemente arrástralas!</br>
-		<b>3.- </b>Las cartas de órganos sólo puedes usarlas sobre ti mismo.</br>
-		<b>4.- </b>Las cartas de medicinas y virus puedes usarlas contra un órgano del mismo color que tu carta <b>de cualquier jugador.</b> Aunque, ¿para que ibas a usar un virus sobre ti mismo? ¿O una medicina para curar algún órgano de tu rival?</br>
-		<b>5.- </b>Reune <b>cuatro órganos sanos de distinto color</b> para ganar el juego.</br> 
-		<b>6.- </b>No puedes tener en tu cuerpo <b>dos órganos iguales</b> en ningún momento.</br>
+			<b>1.- </b>Hay 4 tipos de cartas diferentes: órganos, virus, medicinas y <b>cartas especiales</b> de tratamiento.</br>
+			<b>2.- </b>Para usar las cartas de tu mano, ¡simplemente arrástralas!</br>
+			<b>3.- </b>Las cartas de órganos sólo puedes usarlas sobre ti mismo.</br>
+			<b>4.- </b>Las cartas de medicinas y virus puedes usarlas contra un órgano del mismo color que la carta <b>de cualquier jugador.</b> Aunque, ¿para que ibas a usar un virus sobre ti mismo? ¿O una medicina para curar algún órgano de tu rival?</br>
+			<b>5.- </b>Reune <b>cuatro órganos sanos de distinto color</b> para ganar el juego.</br> 
+			<b>6.- </b>No puedes tener en tu cuerpo <b>dos órganos iguales</b> en ningún momento.</br>
 		</p>
 
 		<p class="textoEnumInstrucciones">
@@ -485,6 +484,36 @@
 	</div>
 
 	<div id=pauseButton onclick="pauseGame()">
+	</div>
+
+	<div id="listaTurnos" style="visibility: hidden">
+		<p id="tittleListaTurnos">
+			<b>Turno:</b></br>
+		</p>
+		<p id="textoListaTurnos"></p>
+	</div>
+
+	<div id="listaEventos" style="visibility: hidden">
+		<p id="tittleListaEventos">
+			<b>Eventos:</b>
+			<p id="maximizeListaEventos"></p>
+			<p id="restoreListaEventos"></p>
+			<p id="minimizeListaEventos"></p>
+			</br>
+		</p>
+		<p id="textoListaEventos"></p>
+	</div>
+
+	<div id=reloadButton onclick="reloadGame()">
+	</div>
+
+	<div id=exitButton onclick="exitGame()">
+	</div>
+
+	<div id=sureExitGameButton>
+		<p>¿Estás seguro de querer abandonar la partida?</p>
+		<div id="noExitGameButton" onclick="noExitGame()">NO</div>
+		<div id="yesExitGameButton" onclick="yesExitGame()">SI</div>
 	</div>
 
 </body>

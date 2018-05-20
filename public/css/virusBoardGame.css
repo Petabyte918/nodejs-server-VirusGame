@@ -17,6 +17,8 @@ html {
 }
 
 body {
+	 width: 100%;
+    height: 100%;
 	margin: 0px;
 	background: url(img/startmenuBG3.jpg);
 	background-size: cover;
@@ -39,6 +41,30 @@ input {
 
 input[type=text], input[type=password] {
 	cursor: text;
+}
+
+#container_loading {
+	visibility: hidden;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 0, 0, 0, .4);
+}
+
+#loading {
+    display:    visible;
+    position:   fixed;
+    z-index:    1001;
+    top:        0;
+    left:       45%;
+    height:     0;
+    width:      10%;
+    background: url('img/loading_icon4.gif');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 #canvas {
@@ -449,7 +475,7 @@ input.botonCrearPartida {
 
 #ranquingList {
 	height: 80%;
-	z-index: 10;
+	z-index: 12;
 }
 
 #settingsForm {
@@ -603,93 +629,32 @@ input.botonCrearPartida {
 
 }
 
-/**
-.ranquingUsuario > .ranquingPrimero {
-	background-color: rgba(230, 172, 0, 0.8);
-    -webkit-transition-property: width, height; 
-    -webkit-transition-duration: 2s;
-    transition-property: width, height;
-    transition-duration: 2s;
-
-    border: solid white 1px;
-
-    -ms-border-radius:4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-
-	-webkit-box-shadow: inset 1px -2px 5px 4px #997300, 1px 1px 7px 2px rgba(0,0,0,0.75);
-	-moz-box-shadow: inset 1px -2px 5px 4px #997300, 1px 1px 7px 2px rgba(0,0,0,0.75);
-	box-shadow: inset 1px -2px 5px 4px #997300, 1px 1px 7px 2px rgba(0,0,0,0.75);
-}
-
-.ranquingUsuario > .ranquingSegundo {
-	background-color: rgba(179, 179, 179, 0.8);
-    -webkit-transition-property: width, height; 
-    -webkit-transition-duration: 2s; 
-    transition-property: width, height;
-    transition-duration: 2s;
-
-    border: solid white 1px;
-
-    -ms-border-radius:4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-
-	-webkit-box-shadow: inset 1px -2px 5px 4px #595959, 1px 1px 7px 2px rgba(0,0,0,0.75);
-	-moz-box-shadow: inset 1px -2px 5px 4px #595959, 1px 1px 7px 2px rgba(0,0,0,0.75);
-	box-shadow: inset 1px -2px 5px 4px #595959, 1px 1px 7px 2px rgba(0,0,0,0.75);
-}
-
-.ranquingUsuario > .ranquingTercero {
-	background-color: rgba(204, 102, 0, 0.8);
-    -webkit-transition-property: width, height; 
-    -webkit-transition-duration: 2s;
-    transition-property: width, height;
-    transition-duration: 2s;
-
-    border: solid white 1px;
-
-    -ms-border-radius:4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-
-	-webkit-box-shadow: inset 1px -2px 5px 4px #993300, 1px 1px 7px 2px rgba(0,0,0,0.75);
-	-moz-box-shadow: inset 1px -2px 5px 4px #993300, 1px 1px 7px 2px rgba(0,0,0,0.75);
-	box-shadow: inset 1px -2px 5px 4px #993300, 1px 1px 7px 2px rgba(0,0,0,0.75);
-}
-**/
-
 .ranquingUsuario {
 	float: left;
     padding-top: 0.40em;
 	margin-left: 1em;
-	width: 20%;
+	min-width: 4em;
 }
 
 .ranquingWins {
-	width: 20%;
 	float: right;
 	margin-right: 0.5em;
     padding-top: 0.40em;
+    min-width: 3em;
 }
 
 .ranquingTotal {
-	width: 13%;
 	float: right;
     padding-top: 0.40em;
 	margin-right: 0.5em;
+	min-width: 2em;
 }
 
 .ranquingPercent {
 	float: right;
-
-	width: 10%;
-
     padding-top: 0.40em;
 	margin-right: 0.5em;
+	min-width: 2em;
 }
 
 .ranquingUsuario, .ranquingWins, .ranquingTotal, .ranquingPercent {
@@ -771,12 +736,6 @@ input.botonCrearPartida {
 	font-size: x-large;
 }
 
-#pauseButton {
-	width: 1em;
-	height: 1em;
-	border: 1px solid black;
-}
-
 /** sliders **/
 .switch {
   position: relative;
@@ -851,11 +810,43 @@ input:checked + .slider:before {
 	clear: both;
 }
 
-.cartaIzq {
-    float: left;
-    width: 50%;
-    text-align: -webkit-center;
-}	
+#correcionTransplante {
+	font-size: 0.9em;
+	text-align: center;
+	clear: both;
+
+	color: red;
+	font-weight: bold;
+}
+
+#ayudaTransplanteParteInf {
+	float: left;
+	width: 100%;
+	text-align: center;
+}
+
+#cartaIzq, #cartaDcha, #okButtonTransplante {
+    text-align: center;
+    display: inline-block;
+}
+
+#okButtonTransplante {
+    height: 45px;
+    width: 45px;
+
+	background-repeat: no-repeat;
+    background-color: rgb(154, 205, 50);
+	background-image: url(img/icono-ok2.png);
+	background-size: cover;
+
+    border: solid DarkOliveGreen 2px;
+    box-shadow: inset 0px 0px 4px 4px #202a0a, 4px 5px 7px 0px rgba(0,0,0,0.75);
+    border-radius: 30px;
+    position: relative;
+    top: 3.5em;
+    margin-left: 10px;
+    margin-right: 10px;
+}
 
 .tituloCartaIzq, .tituloCartaDcha {
 	text-align: center;
@@ -874,10 +865,8 @@ input:checked + .slider:before {
     background-size: cover;
 }
 
-.cartaDcha {
-    float: right;
-    width: 50%;
-    text-align: -webkit-center;
+.imagenCartaDcha {
+	float: right;
 }
 
 #iconoOrgano, #iconoVirus, #iconoMedicina, #iconoTratamiento {
@@ -947,7 +936,7 @@ p.textoEnumInstrucciones {
 
 #pauseButton {
 	visibility: hidden;
-	z-index: 50;
+	z-index: 500;
 	top: 10em;
     left: 10em;
     position: absolute;
@@ -971,13 +960,256 @@ p.textoEnumInstrucciones {
 	height: 82px;
 	width: 82px;
 
-	background-color: white;
+	background-repeat: no-repeat;
+	background-color: green;
+	background-image: url(img/pauseButton1.png);
+	background-size: cover;
 
 	-webkit-box-shadow: 0px 0px 0px 0px #197b1d, 0px 0px 0px 6px rgba(0, 0, 0, 0.9);
     -moz-box-shadow: 0px 0px 0px 0px #197b1d, 0px 0px 0px 6px rgba(0, 0, 0, 0.9);
     box-shadow: 0px 0px 0px 0px #197b1d, 0px 0px 0px 6px rgba(0, 0, 0, 0.9);
     border-radius: 10em;
 }
+
+#reloadButton {
+	visibility: hidden;
+	z-index: 500;
+	height: 45px;
+	width: 45px;
+	position: absolute;
+	bottom: 67px;
+	left: 7px;
+
+	background-repeat: no-repeat;
+	background-color: green;
+	background-image: url(img/reload-icon.png);
+	background-size: cover;
+
+	border: solid OliveDrab 4px;
+    box-shadow: inset 0px 0px 4px 4px #202a0a, 5px 7px 15px 3px rgba(0,0,0,0.75);
+    border-radius: 30px;
+}
+
+#reloadButton:active {
+	height: 43px;
+	width: 43px;
+
+	bottom: 65px;
+	left: 10px;
+}
+
+/** 60px de dif entre el boton de reloadGame y el de exitGame **/
+#exitButton {
+	visibility: hidden;
+	z-index: 500;
+	height: 45px;
+	width: 45px;
+	position: absolute;
+	bottom: 7px;
+	left: 7px;
+
+	background-repeat: no-repeat;
+	background-color: green;
+	background-image: url(img/exit-icon.png);
+	background-size: cover;
+
+	border: solid firebrick 4px;
+    box-shadow: inset 0px 0px 4px 4px #4d0000, 5px 7px 15px 3px rgba(0,0,0,0.75);
+    border-radius: 30px;
+}
+
+#exitButton:active {
+	height: 43px;
+	width: 43px;
+
+	bottom: 5px;
+	left: 10px;
+}
+
+#sureExitGameButton {
+	visibility: hidden;
+    position: absolute;
+    max-width: 50%;
+    top: 20%;
+    left: 21%;
+    z-index: 1000;
+    margin: 16px;
+    padding: 15px 25px;
+
+    font-family: 'Oleo Script', Arial, sans-serif;
+    font-size: 20px;
+
+    background-color: #2dc234;
+    background-image: -webkit-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+    background-image: -moz-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+    background-image: -o-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+    background-image: linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+
+    -ms-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+
+    -webkit-box-shadow: 5px 7px 5px #197b1d, 0 0px 20px rgba(0, 0, 0, .4);
+    -moz-box-shadow: 5px 7px 5px #197b1d, 0 0px 20px rgba(0, 0, 0, .4);
+    box-shadow: 5px 7px 5px #197b1d, 0 0px 20px rgba(0, 0, 0, .4);
+
+    color: #fff;
+    display: block;
+    font-family: 'Oleo Script', Arial, sans-serif;
+    font-size: 30px;
+    line-height: 1;
+
+
+    text-align: center;
+    text-decoration: none;
+    text-shadow: 0 -1px 1px rgba(25, 123, 29, .7);
+}
+
+#noExitGameButton, #yesExitGameButton {
+	position: relative;
+	width: 30%;
+    padding: 15px 0px;
+    display: inline;
+    margin: 25px;
+    
+    background-color: #2AAA00;
+    background-image: -webkit-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+    background-image: -moz-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+    background-image: -o-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+    background-image: linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+
+    -ms-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+
+    -webkit-box-shadow: 0 8px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+    -moz-box-shadow: 0 8px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+    box-shadow: 0 8px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+
+    color: #fff;
+    display: block;
+    font-family: 'Oleo Script', Arial, sans-serif;
+    font-size: 30px;
+    line-height: 1;
+
+    text-align: center;
+    text-decoration: none;
+    text-shadow: 0 -1px 1px rgba(25, 123, 29, .7);
+}
+
+#noExitGameButton:active, #yesExitGameButton:active {
+	top: 5px;
+}
+
+#noExitGameButton {
+	float: left;
+}
+
+#yesExitGameButton {
+	float: right;
+}
+
+
+/** ListaTurnos y ListaEventos **/
+#listaTurnos, #listaEventos {
+	position: absolute;
+	border: solid firebrick 4px;
+    border-radius: 15px;
+
+    font-family: 'Lora', serif;
+
+    z-index: 7;
+
+	width: 30em;
+	height: 30em;
+
+	padding: 7px;
+    font-size: 0.95em;
+
+    -webkit-transition-property: width, height, max-width, max-height, background-size; /* Safari */
+    -webkit-transition-duration: 1s; /* Safari */
+    transition-property: width, height, max-width, max-height, background-size;
+    transition-duration: 1s;
+
+}
+
+#listaTurnos {
+    background: url(img/bloqNotas.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    box-shadow: inset 0px 0px 4px 4px #4d0000, 10px 10px 20px 5px rgba(0,0,0,0.75);
+}
+
+#listaEventos {
+    background: url(img/bloqNotas.jpg);
+    background-position-y: 0px;
+    background-repeat: repeat;
+    background-size: 50% 150%;
+    box-shadow: inset 0px 0px 4px 4px #4d0000, 5px 6px 10px 0px rgba(0,0,0,0.75);
+}
+
+#tittleListaTurnos, #tittleListaEventos {
+	text-align: left;
+    font-size: larger;	
+    margin: 0px;
+    margin-bottom: 0.5em;
+	float: left;
+}
+
+#maximizeListaEventos {
+	background: url(img/maximize.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    float: right;
+
+    margin: 2px;
+
+    display: none;
+}
+
+#restoreListaEventos {
+	background: url(img/restore.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    float: right;
+
+    margin: 2px;
+
+    display: block;
+}
+
+#minimizeListaEventos {
+	background: url(img/minimize.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    float: right;
+
+    margin: 2px;
+
+    display: block;
+}
+
+#textoListaTurnos, #textoListaEventos {
+	float: left;
+    margin-top: 2px;
+    margin-bottom: 2px;
+	width: 100%;
+}
+
+#textoListaEventos {
+	overflow-y: hidden;
+}
+
+#textoListaTurnos > p, #textoListaEventos > p {
+	margin: 0px;
+}
+
+p.textoListaTurnosActual {
+	background-color: rgba(178, 34, 34, 0.4); /** firebrick **/
+}
+
 
 /** Instrucciones **/
 #container_instrucciones1, #container_instrucciones2, #container_instrucciones3,

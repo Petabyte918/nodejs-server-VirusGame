@@ -7,21 +7,29 @@ var turno;
 var jugadores = [];
 var infoJugadores = {};
 var deckOfCards = [];
-var movJugador = "";
+var movJugador = {
+		jugOrigen: "",
+		jugDestino: "",
+		texto: "",
+		tipoMov: "",
+		tipoOrgano: "",
+		cartasUsadas: []
+	};
 
 //Informacion exclusiva de cada cliente
 var posJugadores = []; //Posicion que ocupara cada jugador dependiendo del num de jugadores total
 							//Busco pasandole la posicion del jugador
 var posOrganosJugadores = {}; //posOrganosJugadores[posJug] Informacion para dibujar los organos de los jugadores
 var cartasUsuario = []; //Cartas que tiene en la mano cada jugador
-var posCartasUsuario = []; //Informacion para dibujar las cartas de la mano
-var posCubosDescarte = {};
+var posCartasUsuario = {}; //Datos cartas usuario
+var posPlayersHandCards = {}; //Datos cartas otros jugadores
 var organosJugadoresCli = {}; //Informacion de los jugadores y sus organos
 var jugPorPosicion = {}; //Dada una posicion te devuelve un jugador
 var posPorJugador = {}; //Dado un jugador te devuelve una posicion
 var finDescarte = true; //Indica si estoy en proceso de descarte
 var descartes = {0: false, 1: false, 2: false}; //
-var transplante = {enProceso: false, organo1: {organo: "", numJug: -1}, organo2: {organo: "", numJug: -1}};
+var descartesHist = [];
+var transplante = {enProceso: false, organo1: {organo: "", numJug: -1}, organo2: {organo: "", numJug: -1} };
 
 function aleatorioRGBrange(inferior,superior) {
 	var numPosibilidades = superior - inferior;
@@ -35,6 +43,14 @@ function colorAleatorio() {
 
 function cambiaApass(caja) {
 	console.log("cambiaApass()-"+caja);
+}
+
+function isEmpty(data) {
+	if ((data == undefined) || (data == null) || (data == "")) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function shuffle(array) {
@@ -68,6 +84,11 @@ function extend(first, second) {
     return first;
 };
 
+//Convierte la primera letra de un String en mayusculas
+function mayusPrimera(string){
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 //
 function prepararOrganosJugadoresCli(){
 	var posicion = null;
@@ -81,7 +102,7 @@ function prepararOrganosJugadoresCli(){
 			corazon: "",
 			higado: "",
 			hueso: "",
-			organoComodin: ""
+			comodin: ""
 		};
 	}
 }
@@ -170,12 +191,8 @@ function getUsersSorted (optionRanquing, data) {
 	return sortedObj;
 }
 
-function gestionarMov(movJugador){
-
-}
-
 function abrirAyudaCartas (numCarta) {
-	console.log("abrirAyudaCartas()");	
+	//console.log("abrirAyudaCartas()");	
 	//Antes de abrir nuevas cerramos las ya abiertas
 	cerrarAyudaCartas();
 
@@ -220,7 +237,7 @@ function abrirAyudaCartas (numCarta) {
 }
 
 function cerrarAyudaCartas() {
-	console.log("cerrarAyudaCartas()");
+	//console.log("cerrarAyudaCartas()");
 	$("#ayudaErrorMedico").css("visibility", "hidden");
 	$("#ayudaGuanteDeLatex").css("visibility", "hidden");
 
@@ -247,7 +264,7 @@ function takeCard(){
     }
 }
 
-Engine = new function () {
+Engine = new function() {
 	//Responsive canvas
 	this.initCanvas = function(){
 
@@ -296,6 +313,9 @@ Engine = new function () {
 		//6 posiciones libres. La propia, una a la izq, tres enfrente y otra a la dcha
 		var pos1, pos2, pos3, pos4, pos5, pos6 = [];
 		switch(jugadores.length){
+		case 1:
+			posJugadores = [1];
+			break;
 		case 2:
 			posJugadores = [1, 5];
 			break;
@@ -361,7 +381,7 @@ Engine = new function () {
 		posComodin = [20, windowHeight / 2 + heightOrgano * 1.5 + 15 * 2];
 		posOrganosJugadores[2] = {
 			widthOrgano: widthOrgano,
-			heightOrgano:heightOrgano,
+			heightOrgano: heightOrgano,
 			posCerebro: posCerebro,
 			posCorazon: posCorazon,
 			posHueso: posHueso,
@@ -462,72 +482,339 @@ Engine = new function () {
 			posComodin: posComodin
 		};
 	}
-	this.initCubosDescarte = function(){
-		var widthCubo = ((windowWidth / 6) * 0.65) - 20;
-		var heightCubo = (widthCubo * 0.9) //(180/201) Para mantener la prop de la imagen
+	this.initPosPlayersHandCards = function() {
+		//1536px width //console.log("windowWidth: "+windowWidth);
+		//1013px height //console.log("windowHeight: "+windowHeight);
+		var posCarta1, posCarta2, posCarta3 = {};
+		var posX, posY = 0;
+		var imgSrc = 'img/cardImagesLQ/reverseCardLQ.png';
 
-		posCubosDescarte.widthCubo = widthCubo;
-		posCubosDescarte.heightCubo = heightCubo;
+		imgOnload[imgSrc] = new Image();
+		imgOnload[imgSrc].src = imgSrc;
 
-		posCubosDescarte[1] = {
-			x: ((windowWidth / 2) - widthCubo * 2 - 30),
-			y: ((windowHeight / 3) + 30)
+		if (windowWidth/windowHeight < 1.6) {
+			var widthCarta = ((windowWidth/3)/4) * 0.8; //Relacion de tamaño igual que cartas de usuario, pero mas pequenias
+			var heightCarta = widthCarta * (1536/1013);
+		} else {
+			var posYUsername = posOrganosJugadores[1].posCerebro[1] - 20;
+			var posUser = ((windowHeight/3)*2);
+			var heightCarta = (posYUsername - posUser) * 0.8; //Relacion de tamaño igual que cartas de usuario, pero mas pequenias
+			var widthCarta = (heightCarta * (1013/1536));
 		}
-		posCubosDescarte[2] = {
-			x: ((windowWidth / 2) - widthCubo * 1 - 10),
-			y: ((windowHeight / 3) + 30)
-		}
-		posCubosDescarte[3] = {
-			x: ((windowWidth / 2) + widthCubo * 0 + 10),
-			y: ((windowHeight / 3) + 30)
-		}
-		posCubosDescarte[4] = {
-			x: ((windowWidth / 2) + widthCubo * 1 + 30),
-			y: ((windowHeight / 3) + 30)
-		}
-	}	
+
+		var sepEntreCartas = 4; //max = widthCarta/4
+		var sepDesdeOrganos = 32; //Hay que separarlo de los nombres de jugadores
+		
+		posPlayersHandCards.widthCarta = widthCarta;
+		posPlayersHandCards.heightCarta = heightCarta;
+		posPlayersHandCards.sepEntreCartas = sepEntreCartas;
+		posPlayersHandCards.imgSrc = imgSrc;
+
+		//Posicion 1
+		posPlayersHandCards[1] = null;
+
+		//Posicion 2
+		posX = posOrganosJugadores[2].posCerebro[0] + posOrganosJugadores[2].widthOrgano + sepDesdeOrganos*2;
+
+		posCarta1 = {x: posX,
+				  y: windowHeight/2 - widthCarta*1.5 - sepEntreCartas}
+		posCarta2 = {x: posX,
+				  y: windowHeight/2 - widthCarta*0.5}
+		posCarta3 = {x: posX,
+				  y: windowHeight/2 + widthCarta*0.5 + sepEntreCartas}
+
+		posPlayersHandCards[2] = {carta1: posCarta1,
+								  carta2: posCarta2,
+								  carta3: posCarta3};
+
+		//Posicion 3
+		posY = posOrganosJugadores[3].posCerebro[1] + posOrganosJugadores[3].heightOrgano + sepDesdeOrganos;
+
+		posCarta1 = {x: (windowWidth/6)*1 - widthCarta*1.5 - sepEntreCartas,
+				  y: posY}
+		posCarta2 = {x: (windowWidth/6)*1 - widthCarta*0.5,
+				  y: posY}
+		posCarta3 = {x: (windowWidth/6)*1 + widthCarta*0.5 + sepEntreCartas,
+				  y: posY}
+
+		posPlayersHandCards[3] = {carta1: posCarta1,
+								  carta2: posCarta2,
+								  carta3: posCarta3};
+
+		//Posicion 4
+		posY = posOrganosJugadores[4].posCerebro[1] + posOrganosJugadores[4].heightOrgano + sepDesdeOrganos;
+
+		posCarta1 = {x: (windowWidth/6)*3 - widthCarta*1.5 - sepEntreCartas,
+				  y: posY}
+		posCarta2 = {x: (windowWidth/6)*3 - widthCarta*0.5,
+				  y: posY}
+		posCarta3 = {x: (windowWidth/6)*3 + widthCarta*0.5 + sepEntreCartas,
+				  y: posY}
+
+		posPlayersHandCards[4] = {carta1: posCarta1,
+								  carta2: posCarta2,
+								  carta3: posCarta3};		
+		//Posicion 5
+		posY = posOrganosJugadores[5].posCerebro[1] + posOrganosJugadores[5].heightOrgano + sepDesdeOrganos;
+
+		posCarta1 = {x: (windowWidth/6)*5 - widthCarta*1.5 - sepEntreCartas,
+				  y: posY}
+		posCarta2 = {x: (windowWidth/6)*5 - widthCarta*0.5,
+				  y: posY}
+		posCarta3 = {x: (windowWidth/6)*5 + widthCarta*0.5 + sepEntreCartas,
+				  y: posY}
+
+		posPlayersHandCards[5] = {carta1: posCarta1,
+								  carta2: posCarta2,
+								  carta3: posCarta3};	
+	}
 	this.initPosCartasUsuario = function(){
+		//console.log("Engine.initPosCartasUsuario()");
+		//1536px width //console.log("windowWidth: "+windowWidth);
+		//1013px height //console.log("windowHeight: "+windowHeight);
 
-		var distDisp = posCubosDescarte[1].y + posCubosDescarte.heightCubo;
-		//La altura de las cartas del usuario sera proporcional al espacio entre los cubos y los organos del usuario
-		var heightCarta = (posOrganosJugadores[1].posCerebro[1] - distDisp - 70) * 0.90;
-		//La anchura de las cartas del usuario esta en proporcion con (1536/1013)
-		var widthCarta = heightCarta * (1013/1536);
+		if (windowWidth/windowHeight < 1.6) {
+			var widthCarta = ((windowWidth/3)/4);
+			var heightCarta = widthCarta * (1536/1013);
+		} else {
+			var posYUsername = posOrganosJugadores[1].posCerebro[1] - 20;
+			var posUser = ((windowHeight/3)*2);
+			var heightCarta = posYUsername - posUser;
+			var widthCarta = heightCarta * (1013/1536);
+		}
 
-		//La posY sera centrada entre los cubos y el espacio para los organos
-		var posY = ((distDisp - heightCarta) / 2) + posCubosDescarte[1].y;
+		var sepEntreCartas = 8; //max = widthCarta/4
 
-		var posCarta1 = [windowWidth/2 - widthCarta*1.5 - 10, posY];
-		var posCarta2 = [windowWidth/2 - widthCarta*0.5, posY];
-		var posCarta3 = [windowWidth/2 + widthCarta*0.5 + 10, posY];
-		posCartasUsuario = [widthCarta, heightCarta, posCarta1, posCarta2, posCarta3];
+		//Debajo del mazo de descartes
+		//Aprovechamos que los descartes no ocupan toda su altura y comenzamos desde ahí
+		//var posYDeck = Math.floor(windowHeight/3); //De DeckOfCards.initDeckOfCards();
+		//var widthDeck = Math.floor((windowWidth/3)/3); //De DeckOfCards.initDeckOfCards();
+		//var heightDeck = Math.floor(widthDeck*210/148); //De DeckOfCards.initDeckOfCards();
+		//var posY = posYDeck + heightDeck + sepEntreCartas;
+
+		//Justo encima del nombre de jugador
+		var posY = posOrganosJugadores[1].posCerebro[1] - 40 - heightCarta;
+
+		var posCarta1 = {x: windowWidth/2 - widthCarta*1.5 - sepEntreCartas, 
+						 y: posY};
+		var posCarta2 = {x: windowWidth/2 - widthCarta*0.5,
+						 y: posY};
+		var posCarta3 = {x: windowWidth/2 + widthCarta*0.5 + sepEntreCartas,
+						 y: posY};
+
+		posCartasUsuario = {width: widthCarta, 
+							height: heightCarta,
+							carta1: posCarta1,
+							carta2: posCarta2,
+							carta3: posCarta3};
 
 	}
 	this.initFinDescartesButton = function() {
-		/** Colocacion Por cubos de descarte **/
-		var widthCubo = ((windowWidth / 6) * 0.65) - 20;
+		var elemDescartesButton = document.getElementById("descartes_boton");
+		var posDescartesButton = elemDescartesButton.getBoundingClientRect();
 
-		var posX = posCubosDescarte[4].x + widthCubo + 10;
-		var posY = posCubosDescarte[4].y - 5;
+		var posX = (Math.floor(windowWidth - posDescartesButton.width - 20)).toString()+"px";
+		var posY = (Math.floor(windowHeight - posDescartesButton.height - 20)).toString()+"px";
 
 		$("#descartes_boton").css({"top": posY, "left": posX});
-
-
-		/** Colocacion por cartas de usuario
-		var posX = posCartasUsuario[4][0] + posCartasUsuario[0] + 20;
-		var posY = posCartasUsuario[4][1] + 20;
-
-		$("#descartes_boton").css({"top": posY, "left": posX});**/
 	}
 	this.initPauseButton = function() {
 		$("#pauseButton").css("visibility","visible");
+		var elemPauseButton = document.getElementById("pauseButton");
+		var posPauseButton = elemPauseButton.getBoundingClientRect();
 
-		var left = (Math.floor(posCubosDescarte[1].x - 50)).toString()+"px";
+		var left = (Math.floor(posOrganosJugadores[1].posCerebro[0] - posPauseButton.width - 20)).toString()+"px";
 		//Algo hardCoding. El 84 es la altura del elemento..claro, que tp se va a cambiar y estas hasta los huevos
 		var top = (Math.floor(windowHeight - 84 - 30)).toString()+"px";
 
 		$("#pauseButton").css("left", left);
 		$("#pauseButton").css("top", top);
 	}
+	this.varsToInit = function () {
+		//ENGINE
+		idPartida = "";
+		turno = "";
+		jugadores = [];
+		infoJugadores = {};
+		deckOfCards = [];
+		movJugador = {
+			jugOrigen: "",
+			jugDestino: "",
+			texto: "",
+			tipoMov: "",
+			cartasUsadas: []
+		};
+
+		//Informacion exclusiva de cada cliente
+		posJugadores = []; //Posicion que ocupara cada jugador dependiendo del num de jugadores total
+									//Busco pasandole la posicion del jugador
+		posOrganosJugadores = {}; //posOrganosJugadores[posJug] Informacion para dibujar los organos de los jugadores
+		cartasUsuario = []; //Cartas que tiene en la mano cada jugador
+		posCartasUsuario = {}; //Datos cartas usuario
+		posPlayersHandCards = {}; //Datos cartas otros jugadores
+		organosJugadoresCli = {}; //Informacion de los jugadores y sus organos
+		jugPorPosicion = {}; //Dada una posicion te devuelve un jugador
+		posPorJugador = {}; //Dado un jugador te devuelve una posicion
+		descartes = {0: false, 1: false, 2: false}; //
+		transplante = {enProceso: false, organo1: {organo: "", numJug: -1}, organo2: {organo: "", numJug: -1}};
+
+		//GAME
+		objetos = [];
+		reDimCanvasON = true;
+
+		//CLIENTE
+		lista_partidas = {};
+		idPartidaEsperando = "";
+		enPartidaEsperando = false;
+		gamePaused = "false";
+	}
 }
 
+DeckOfCards = new function() {
+	//148px width
+	//210px height
+	this.deckData = {};
+	this.descartesData = {};
+
+	this.tmp = 0;
+
+	this.initDeckOfCards = function() {
+		var reduccion = 0.8;
+		if (windowWidth/windowHeight < 1.6) {
+			var width = ((windowWidth/3)/3) * reduccion;
+			var height = width*210/148;
+		} else {
+			var height = (windowHeight/4) * reduccion;
+			var width = height*148/210;
+		}
+
+		var posXDeck = windowWidth/2 - width;
+		var posYDeck = windowHeight/2 - height/1.5; //No esta centrado sino algo mas arriba
+
+		this.deckData = {x: posXDeck, y: posYDeck, width: width, height: height};
+
+		var posXDescartes = windowWidth/2 + 10;
+		var posYDescartes = windowHeight/2 - height/1.5; //No esta centrado sino algo mas arriba
+
+		//Los ajustes de tamanio finales son debidos a la diferencia de tamanio entre el mazo y la carta del reverso,
+		//por el efecto profundidad del mazo
+		if (descartesHist.length == 0) {
+			var src = 'img/cardImagesLQ/reverseCardLQ.png';
+		} else {
+			var src = descartesHist[descartesHist.length - 1].picture;
+		}
+		this.descartesData = {
+							x: posXDescartes,
+							y: posYDescartes+5, 
+							width: width*0.91, 
+							height: height*0.91,
+							src: src
+							};
+	}
+	this.renderDeck = function() {
+		var deck = new Image();
+		deck.src = 'img/cardImagesLQ/deckCardsLQ.png';
+
+		var posX = this.deckData.x;
+		var posY = this.deckData.y;
+		var width = this.deckData.width;
+		var height = this.deckData.height;
+
+		deck.onload = function(){
+			cxBG.drawImage(deck, posX, posY, width, height);
+		}
+	}
+	this.renderDescarte = function() {
+		var descarte = new Image();
+
+		descarte.src = this.descartesData.src;
+
+		var posX = this.descartesData.x;
+		var posY = this.descartesData.y;
+		var width = this.descartesData.width;
+		var height = this.descartesData.height;
+
+		var verDescarte = new Image();
+		//verDescarte.src = 'img/cardImagesLQ/verDescartes.png';
+		verDescarte.src = 'img/cardImagesLQ/eyeDescartes.png';
+
+		descarte.onload = function() {
+			cxBG.drawImage(descarte, posX, posY, width, height);
+			if (descartesHist.length != 0) {
+				verDescarte.onload = function() {
+					cxBG.drawImage(verDescarte, posX + width - 5 - width/3, posY + 5, width/3, width*(352/480)/3);
+				}
+			}
+		}
+	}
+	this.getDescartesData = function(data) {
+		switch(data){
+		case "posX":
+			return this.descartesData.x;
+			break ;
+		case "posY":
+			return this.descartesData.y;
+			break
+		case "width":
+			return this.descartesData.width;
+			break;
+		case "height":
+			return this.descartesData.height;
+			break;
+		default:
+			return null;
+			break;
+		}
+	}
+	this.getDeckData = function(data) {
+		switch(data){
+		case "posX":
+			return this.deckData.x;
+			break ;
+		case "posY":
+			return this.deckData.y;
+			break
+		case "width":
+			return this.deckData.width;
+			break;
+		case "height":
+			return this.deckData.height;
+			break;
+		default:
+			return null;
+			break;
+		}
+	}
+	this.reDimDeckOfCards =  function() {
+		this.initDeckOfCards();
+		this.renderDeck();
+		this.renderDescarte();
+	}
+}
+
+CountDown = new function() {
+	this.radius = 30;
+	this.x = 0;
+	this.y = 0;
+
+	this.reDimCountDown = function() {
+		this.radius = 30;
+		this.x = windowWidth/3;
+		this.y = windowHeight/2;
+	}
+	this.getPosX = function() {
+		return this.x;
+	}
+	this.getPosY = function() {
+		return this.y;
+	}
+	this.getRadius = function() {
+		return this.radius;
+	}
+	this.getPosYtextoTurno = function() {
+		return this.y - 50;
+	}
+	this.getHeightTextoTurno = function() {
+		return 25;
+	}
+}

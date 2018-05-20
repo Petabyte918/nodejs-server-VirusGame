@@ -5,6 +5,7 @@ var idPartidaEsperando = "";
 var enPartidaEsperando = false;
 var ayudaFuerte;
 var ayudaDebil;
+var logged = "false";
 var gamePaused = "false";
 /** Establecimiento de la conexion con el servidor **/
 var socket = io.connect('https://nodejs-server-virusgame.herokuapp.com/');
@@ -23,7 +24,7 @@ windowWidth = window.innerWidth;
 windowHeight = window.innerHeight;
 
 function configInicial() {
-	//console.log("configInicial()");
+	console.log("configInicial()");
 
 	var autoLogin = localStorage.getItem('autoLogin');
 	if (autoLogin == "") {
@@ -79,6 +80,9 @@ function configInicial() {
 	if (optionRanquing == undefined) {
 		localStorage.setItem('optionRanquing', 'wins');
 	}
+
+	//Set loading - centrado y tamaño
+	reDimLoading();
 }
 //Comprobamos si hemos abandonado una partida en curso
 //checkMatchRunning();
@@ -101,7 +105,7 @@ function button_create() {
 	$("#register").css("display", "none");
 	$("#cuadroPartidaRapida").css("display", "none");
 	$("#instrucciones").css("display", "none");
-	$("#ranquingList").css("display", "none");
+	$("#ranquingList").css("visibility", "hidden");
 	$("#container_instrucciones1").css("display", "none");
 	$("#container_instrucciones2").css("display", "none");
 	$("#container_instrucciones3").css("display", "none");
@@ -127,7 +131,7 @@ function button_lista_partidas() {
 	$("#register").css("display", "none");
 	$("#cuadroPartidaRapida").css("display", "none");
 	$("#instrucciones").css("display", "none");
-	$("#ranquingList").css("display", "none");
+	$("#ranquingList").css("visibility", "hidden");
 	$("#container_instrucciones1").css("display", "none");
 	$("#container_instrucciones2").css("display", "none");
 	$("#container_instrucciones3").css("display", "none");
@@ -149,8 +153,10 @@ function backTo_InitMenu() {
 	$("#cuadroFinPartida").css("display", "none");
 	$("#instrucciones").css("display", "inline");
 	$("#pauseButton").css("visibility", "hidden");
-	var logged = localStorage.getItem("logged");
-	//console.log("backTo_InitMenu()->logged: "+logged);
+	$("#listaTurnos").css("visibility", "hidden");
+	$("#listaEventos").css("visibility","hidden");
+	$("#reloadButton").css("visibility","hidden");
+	$("#exitButton").css("visibility","hidden");
 	if (logged == "true") {
 		$("#leave").css("display", "inline");
 		$("#userNameContainer").css("display", "block");
@@ -198,16 +204,17 @@ function button_leave () {
 	document.form_login_user.loginName.value = "";
 	document.form_login_user.loginPass.value = "";
 	localStorage.setItem("logged", "false");
+	logged = "false";
 }
 
 function button_ranquing () {
 	//console.log("button_ranquing()");
-	if ($("#ranquingList").css("display") == "block") {
+	if ($("#ranquingList").css("visibility") == "visible") {
 		$("#settingsForm").css("display","none");
-		$("#ranquingList").css("display", "none");
+		$("#ranquingList").css("visibility", "hidden");
 	} else {
 		$("#settingsForm").css("display","none");
-		$("#ranquingList").css("display", "block");
+		$("#ranquingList").css("visibility", "visible");
 		reDimRanquingList();
 	}
 	socket.emit('request_users', {request: 'create_ranquing'});
@@ -217,17 +224,21 @@ function button_settings () {
 	//console.log("button_settings");
 	if ($("#settingsForm").css("display") == "block") {
 		$("#settingsForm").css("display","none");
-		$("#ranquingList").css("display", "none");
+		$("#ranquingList").css("visibility", "hidden");
 	} else {
 		$("#settingsForm").css("display","block");
-		$("#ranquingList").css("display", "none");
+		$("#ranquingList").css("visibility", "hidden");
 	}
 }
 /** -------------------- **/
 
 /** Interaccion con el servidor de los botones iniciales **/
 function form_login() {
-	//console.log("form_login()")
+	//console.log("form_login()");
+
+	//Motramos la animacion de loading
+	$("#container_loading").css("visibility","visible");
+
 	var loginName = document.form_login_user.loginName.value;
 	var loginPass = document.form_login_user.loginPass.value;
 	//Guardamos usuario y contraseña
@@ -256,22 +267,34 @@ socket.on('login_user-OK', function(message) {
 	$("#leave").css("display", "block");
 
 	localStorage.setItem("logged", "true");
+	logged = "true";
+
+	//Ocultamos el loading
+	$("#container_loading").css("visibility","hidden");
 });
 
 socket.on('login_user-KO', function(message) {
 	localStorage.removeItem('loginName');
 	localStorage.removeItem('loginPass');
 	localStorage.setItem("logged", "false");
+	logged = "false";
 
 	//console.log("login_user-KO: "+message);
 	document.getElementById("loginCorrection").innerHTML = "Usuario o contraseña incorrectos";
 	document.getElementById("userNameContainer").innerHTML = ""
 	document.form_login_user.loginName.value = "";
 	document.form_login_user.loginPass.value = "";
+
+	//Ocultamos el loading
+	$("#container_loading").css("visibility","hidden");
 });
 
 function form_register() {
 	//console.log("form_register()");
+
+	//Mostramos la animacion de loading
+	$("#container_loading").css("visibility","visible");
+
 	var registerName = document.form_register_user.registerName.value;
 	var registerPass1 = document.form_register_user.registerPass1.value;
 	var registerPass2 = document.form_register_user.registerPass2.value;
@@ -303,6 +326,9 @@ socket.on('register_user-OK', function(message) {
 	$("#registerForm").css("display", "none");
 	$("#loginForm").css("display", "block");
 
+	//Ocultamos el loading
+	$("#container_loading").css("visibility","hidden");
+
 	//Autologin tras registrarnos correctamente
 	form_login();
 });
@@ -313,6 +339,9 @@ socket.on('register_user-KO', function(message) {
 	//Quitar ya que si por mala conexion llegan peticiones retrasadas, el campo queda vacio.
 	//Por register_user-OK ya se gestionado todo
 	//document.form_register_user.registerName.value = "";
+
+	//Ocultamos el loading
+	$("#container_loading").css("visibility","hidden");
 });
 
 function mostrarInstrucciones(pagina) {
@@ -444,7 +473,7 @@ function form_createGame() {
 	//console.log("gameName: "+gameName);
 	//console.log("gameNumPlayers: "+gameNumPlayers);
 	 if (gameName == "") {
-	 	gameName = "Juego de: "+usuario.substr(0,6);
+	 	gameName = "Juego de "+usuario.substr(0,6);
 	 }
 
 	socket.emit('create_game', 
@@ -481,7 +510,7 @@ socket.on('player_leaved', function() {
 	actualizar_partidas();
 }); 
 
-function actualizar_partidas(){
+function actualizar_partidas() {
 	//console.log("function actualizar_partidas()");
 	socket.emit('actualizar_partidas');
 }
@@ -555,7 +584,7 @@ function actualizar_listaPartidas() {
 						'<a class="leave_partida">SALIR</a>'+
 					'</li>'
 				);
-			} else {
+			} else { //Esto era para reengancharse a una partida
 				//Si estoy en partida me salto las partidas llenas si no son la mía
 				if (lista_partidas[id].gamePlayers.length >= lista_partidas[id].gameNumPlayers) {
 					continue;
@@ -572,6 +601,7 @@ function actualizar_listaPartidas() {
 	}
 }			
 
+//Partida en sala de espera
 function joinPartida(idPartida , flag) {
 	//console.log("joinPartida()");
 
@@ -603,6 +633,7 @@ function joinPartida(idPartida , flag) {
 	}
 }
 
+//Partida en sala de espera
 function leavePartida(idPartida) {
 	//console.log("leavePartida()");
 	var enPartida = false;
@@ -638,9 +669,8 @@ socket.on('prepararPartida', function(datos_iniciales){
 	//console.log("prepararPartida");
 
 	idPartida = datos_iniciales.idPartida;
-	//No guardamos al usuario antes, no nos hace falta e igualmente debemos guardalo aqui si tenemos un idPartida
-	//guardado pero el servidor ya ha eliminado la partida o nos ha eliminado de la partida
 	jugadores = datos_iniciales.jugadores;
+
 	cartasUsuario.push(datos_iniciales.carta1);
 	cartasUsuario.push(datos_iniciales.carta2);
 	cartasUsuario.push(datos_iniciales.carta3);
@@ -649,7 +679,7 @@ socket.on('prepararPartida', function(datos_iniciales){
 	Engine.initCanvas();
 	Engine.initJugadores();
 	Engine.initPosOrganosJugadores();
-	Engine.initCubosDescarte();
+	Engine.initPosPlayersHandCards();
 	Engine.initPosCartasUsuario();
 	Engine.initFinDescartesButton();
 	Engine.initPauseButton();
@@ -663,29 +693,18 @@ socket.on('prepararPartida', function(datos_iniciales){
 	prepararOrganosJugadoresCli();
 	moveObjects();
 
-	actualizarCanvas();
-	//actualizarCanvasMID();
+	actualizarCanvasAPO();
+
+	reDimReloadButton(); //Solo para hacerlos visibles
+	reDimExitButton(); //Solo para hacerlos visibles
 })
 
 function esperarMovimiento(){
 	esperarMovSTO = setTimeout(function(){ 
-		if (movJugador == "") {
+		if (movJugador.tipoMov == "") {
 			//console.log("Esperando movimiento");
 			esperarMovimiento();
 		} else {
-			if (movJugador == "tiempo_agotado") {
-				var newDatos_partida = {
-					idPartida: idPartida,
-					jugadores: jugadores,
-					infoJugadores: infoJugadores,
-					turno: turno,
-					numTurno : numTurno,
-					deckOfCardsPartida: deckOfCards,
-					organosJugadoresCli: organosJugadoresCli,
-					movJugador: movJugador
-				};
-				socket.emit('tiempo_agotado', newDatos_partida);
-			} 
 			if (turno == usuario) {
 				//Comprobamos si hay ganador
 				var ganador = checkPartidaTerminada();
@@ -700,7 +719,6 @@ function esperarMovimiento(){
 					socket.emit('terminarPartida', data);
 				} else {
 					//Si no hay ganador seguimos con el juego
-					console.log("Nuestro movimiento ha sido: "+movJugador);
 					var newDatos_partida = {
 						idPartida: idPartida,
 						jugadores: jugadores,
@@ -722,42 +740,13 @@ function esperarMovimiento(){
 function comunicarTiempoAgotado () {
 	datos = {
 		idPartida: idPartida,
+		numTurno: numTurno,
 		turno: turno,
-		numTurno: numTurno
+		infoJugadores: infoJugadores
 	}
 	//console.log("Avisamos al servidor que puede haber un jugador inactivo");
 	socket.emit('tiempo_agotado', datos);
 }
-
-socket.on('tiempo_agotadoOK', function() {
-	//console.log("Servidor ha recibido correctamente el turno perdido. Retransmitimos avanzar turno");
-	//Avanzamos turno - NO -> En principio ya avanzamos turno en el servidor
-	/**var index = jugadores.indexOf(turno);
-	if (index < (jugadores.length -1)) {
-		index++;
-	} else {
-		index = 0;
-	}
-	turno = jugadores[index];
-	numTurno = numTurno++;**/
-
-	//Todos los demas jugadores aumentaran este turno, pero tenemos un "seguro" en socket.on('siguienteTurnoCli'
-	//pero si no, daria igual
-	infoJugadores[turno].turnosPerdidos++;
-	infoJugadores[turno].turnoPerdida = numTurno;
-	//Avisamos al servidor que retransmita el cambio de turno
-	var newDatos_partida = {
-		idPartida: idPartida,
-		jugadores: jugadores,
-		infoJugadores: infoJugadores,
-		turno: turno,
-		numTurno : numTurno,
-		deckOfCardsPartida: deckOfCards,
-		organosJugadoresCli: organosJugadoresCli,
-		movJugador: movJugador
-	};
-	socket.emit('siguienteTurnoSrv', newDatos_partida);
-});
 
 function checkPartidaTerminada(){
 	//Dos formas de ganar. Tener un cuerpo entero completo SANO...
@@ -788,9 +777,9 @@ function checkPartidaTerminada(){
 			
 			totalOrganosCompletos++;
 		}
-		if ((organosJugadoresCli[jugador].organoComodin == "normal") ||
-			(organosJugadoresCli[jugador].organoComodin == "vacunado") ||
-			(organosJugadoresCli[jugador].organoComodin == "inmunizado")) {
+		if ((organosJugadoresCli[jugador].comodin == "normal") ||
+			(organosJugadoresCli[jugador].comodin == "vacunado") ||
+			(organosJugadoresCli[jugador].comodin == "inmunizado")) {
 			
 			totalOrganosCompletos++;
 		}
@@ -809,29 +798,39 @@ function checkPartidaTerminada(){
 socket.on('siguienteTurnoCli', function(datos_partida){
 	//console.log("siguienteTurnoCli");
 
-	//Si el anterior jugador ha perdido el turno, llegaran uno o varios mensajes
-	//Usamos el primero y saltamos el resto
-	//Si el turno que teniamos guardado, es igual al turno que nos llega es que el turno ya ha sido procesado
-	//Si hubiera problemas, subir mas arriba esta instruccion turno = datos_partida.turno;
+	//Actualizo datos
+	if (datos_partida.movJugador.tipoMov == "abandonarPartida") {
+		console.log("Recibido jugador que abandona partida. Actualizo datos y canvas");
+		//Actualizo ciertos datos
+		//Para eliminar al jugador que abandona de organosJugadoresCli
+		for (var i = 0; i < jugadores.length; i++) {
+			if (datos_partida.jugadores.indexOf(jugadores[i]) == -1) {
+				delete organosJugadoresCli[jugadores[i]];
+			}
+		}
+		//Otros
+		jugadores = datos_partida.jugadores;
+   		infoJugadores = datos_partida.infoJugadores;
+		representarMov(datos_partida.movJugador); //Escribo en el cuadro de movs
+		doneResizing(); //Recargo
+	}
+
+	//Evitamos replicas
 	if (turno == datos_partida.turno) {
-		//console.log("Mensajes retrasados de pierde turno");
+		//console.log("Mensajes retrasados");
 		return;
 	}
+	turno = datos_partida.turno;
+	movJugador = datos_partida.movJugador;
 
 	clearTimeout(countDownSTO);
 	clearTimeout(esperarMovSTO);
+
 	cerrarAyudaCartas();
-
-	movJugador = datos_partida.movJugador;
-
-	//Representar movimiento (nuestro mov quedara representado en el sig mensaje
-	//enviado por el servidor)
-	//Pendiente
-	representarMov(movJugador);
 
 	//Guante de Latex
 	//El jugador de la carta no se descarta
-	if ((movJugador == "guanteDeLatex") && (usuario != turno)) {
+	if ((movJugador.tipoMov == "guanteDeLatex") && (usuario != turno)) {
 		objetos[0].src = "";
 		objetos[1].src = "";
 		objetos[2].src = "";
@@ -839,55 +838,60 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 		descartes[1] = true;
 		descartes[2] = true;
 		finDescarte = false;
-		actualizarCanvas();
+		actualizarCanvasAPO();
 	}
 	//Pero solo le permitimos recuperar sus cartas en SU turno
 	if ((finDescarte == false) && (usuario == datos_partida.turno)) {
-		$("#descartes_boton").css("display","inline");
+		$("#descartes_boton").css("visibility","visible");
 	}
 
-	//Una vez representado el movimiento del jugador, borramos el mov
-	movJugador = "";
-
-	turno = datos_partida.turno;
 	idPartida = datos_partida.idPartida;
 	jugadores = datos_partida.jugadores;
-    infoJugadores = datos_partida.infoJugadores,
+    infoJugadores = datos_partida.infoJugadores;
 	numTurno = datos_partida.numTurno;
 	deckOfCards = datos_partida.deckOfCardsPartida;
 
-	//Compruebo si me han echado de la partida
-	if (jugadores.indexOf(usuario) == -1) {
-		//console.log("Hemos sido expulsados de la partida");
-		backTo_InitMenu();
-		return;
-	}
-
-	//Comprobamos si nos estamos reenchando a la partida
-	//if (cartasUsuario.length <= 0){
-	//	handleReconect();
-	//}
-
-	if (datos_partida.organosJugadoresCli != undefined){
+	if (!(isEmpty(datos_partida.organosJugadoresCli))) {
 		for (var jugador in datos_partida.organosJugadoresCli){
 			organosJugadoresCli[jugador].cerebro = datos_partida.organosJugadoresCli[jugador].cerebro;
 			organosJugadoresCli[jugador].corazon = datos_partida.organosJugadoresCli[jugador].corazon;
 			organosJugadoresCli[jugador].higado = datos_partida.organosJugadoresCli[jugador].higado
 			organosJugadoresCli[jugador].hueso = datos_partida.organosJugadoresCli[jugador].hueso;
-			organosJugadoresCli[jugador].organoComodin = datos_partida.organosJugadoresCli[jugador].organoComodin;
+			organosJugadoresCli[jugador].comodin = datos_partida.organosJugadoresCli[jugador].comodin;
+		}
+		//Lo dejo como aviso a navegantes. Lo de abajo es caca
+		//organosJugadoresCli = datos_partida.organosJugadoresCli;
+		//Si un jugador ha sido eliminado, tb lo eliminamos de nuestra lista de organosJugadoresCli
+		for (var jugador in organosJugadoresCli) {
+			if (isEmpty(datos_partida.organosJugadoresCli[jugador])) {
+				delete organosJugadoresCli[jugador];
+			}
 		}
 	}
 
 	checkCards();
-	indicarTurno(turno);
 
-	//Conforman el hilo de ejecucion del turno del usuario
+	representarMov(movJugador);
+
+	//Actualizo despues de procesar mov, pues hasta despues animacion no se resetea todo
+	renderCountDown(30, new Date(),"first"); //->setTimeOut
+
+	//Una vez representado el movimiento del jugador, borramos el mov
+	movJugador = {
+		jugOrigen: "",
+		jugDestino: "",
+		texto: "",
+		tipoMov: "",
+		tipoOrgano: "",
+		cartasUsadas: []
+	};
+
 	esperarMovimiento(); //->setTimeOut
-	renderCountDown(30, new Date()); //->setTimeOut
 });
 
 function pauseGame(){
 	console.log("pauseGame()");
+
 	var datos_partida = {
 		idPartida: idPartida
 	};
@@ -896,41 +900,143 @@ function pauseGame(){
 		socket.emit('pauseGame', datos_partida);
 	} else if (gamePaused == "true") {
 		socket.emit('continueGame', datos_partida);
-
 	}
 }
 
 socket.on('pauseGame', function(datos_partida) {
-	//console.log("socket.on->pauseGame");
+	console.log("socket.on->pauseGame");
 	gamePaused = "true";
 	//Cambiamos color
 	$("#pauseButton").css("background-color","red");
 	clearTimeout(countDownSTO); //->setTimeOut
 	clearTimeout(esperarMovSTO); //->setTimeOut
-})
+});
 
 socket.on('contineGame', function(datos_partida) {
-	//console.log("socket.on->continueGame");	
+	console.log("socket.on->continueGame");	
 	gamePaused = "false";
 	//Cambiamos color
 	$("#pauseButton").css("background-color","green");
 	esperarMovimiento(); //->setTimeOut
 	renderCountDown(30, new Date()); //->setTimeOut
-})
+});
 
-function representarMov(movJugador) {
+function reloadGame() {
+	console.log("reloadGame()");
 
+	doneResizing();
 }
 
-function checkCards() {
-	for (var i = 0; i < objetos.length; i++) {
-		if (objetos[i].src == ""){
-			nuevaCarta(i);
-		}
-	}
+function exitGame() {
+	console.log("exitGame()");
+	$("#sureExitGameButton").css("visibility", "visible");
 }
+
+function noExitGame() {
+	console.log("noExitGame()");
+	$("#sureExitGameButton").css("visibility", "hidden");
+}
+
+function yesExitGame() {
+	console.log("yesExitGame()");
+	$("#sureExitGameButton").css("visibility", "hidden");
+	var datos_partida = {
+		idPartida: idPartida,
+		jugadores: jugadores,
+		infoJugadores: infoJugadores,
+		turno: turno,
+		numTurno : numTurno,
+		deckOfCardsPartida: deckOfCards,
+		organosJugadoresCli: organosJugadoresCli,
+		movJugador: movJugador
+	};
+	socket.emit('abandonarPartida', datos_partida);
+}
+
+socket.on('partidaAbandonadaOK', function(data) {
+	console.log("socket.on->partidaAbandonadaOK");	
+	//En lugar de volver inmediatamente al menu principal, mostramos cartel de expulsado
+	//similar al de haber acabado la partida
+	//backTo_InitMenu();
+
+	//Reseteamos cosas
+	clearTimeout(countDownSTO);
+	clearTimeout(esperarMovSTO);
+
+	//Representamos cuadro fin de partida
+	var widthElem = parseInt(($("#cuadroFinPartida").css("width")).replace("px",""));
+	var heightElem = parseInt(($("#cuadroFinPartida").css("height")).replace("px",""));
+	var marginElem = parseInt(($("#cuadroFinPartida").css("margin")).replace("px",""));
+	var borderElem = parseInt(($("#cuadroFinPartida").css("border-width")).replace("px",""));
+	var paddingTopElem = parseInt(($("#cuadroFinPartida").css("padding-top")).replace("px",""));
+	var paddingLeftElem = parseInt(($("#cuadroFinPartida").css("padding-left")).replace("px",""));
+
+	var posX = (windowWidth - widthElem)/2 - marginElem - borderElem - paddingLeftElem;
+	var posY = (windowHeight - heightElem)/2 - marginElem - borderElem - paddingTopElem;
+	var posXStr = (Math.floor(posX)).toString()+"px";
+	var posYStr = (Math.floor(posY)).toString()+"px";
+	$("#cuadroFinPartida").css("left", posXStr);
+	$("#cuadroFinPartida").css("top", posYStr);
+
+	$("#cartelFinPartida").css("color", "darkred");
+	document.getElementById("cartelFinPartida").innerHTML = "¡HAS abandonado la partida!"
+	document.getElementById("jugadorFinPartida").innerHTML = "(Looser)";
+	$("#jugadorFinPartida").css("visibility", "visible");
+
+	$("#pauseButton").css("visibility", "hidden");
+	$("#listaTurnos").css("visibility", "hidden");
+	$("#listaEventos").css("visibility","hidden");
+	$("#reloadButton").css("visibility","hidden");
+	$("#exitButton").css("visibility","hidden");
+	$("#cuadroFinPartida").css("display", "block");
+
+	Engine.varsToInit();
+	actualizar_partidas();
+});
+
+socket.on('expulsadoPartida', function(data) {
+	console.log("socket.on->expulsadoPartida");	
+	//En lugar de volver inmediatamente al menu principal, mostramos cartel de expulsado
+	//similar al de haber acabado la partida
+	//backTo_InitMenu();
+
+	//Reseteamos cosas
+	clearTimeout(countDownSTO);
+	clearTimeout(esperarMovSTO);
+
+	//Representamos cuadro fin de partida
+	var widthElem = parseInt(($("#cuadroFinPartida").css("width")).replace("px",""));
+	var heightElem = parseInt(($("#cuadroFinPartida").css("height")).replace("px",""));
+	var marginElem = parseInt(($("#cuadroFinPartida").css("margin")).replace("px",""));
+	var borderElem = parseInt(($("#cuadroFinPartida").css("border-width")).replace("px",""));
+	var paddingTopElem = parseInt(($("#cuadroFinPartida").css("padding-top")).replace("px",""));
+	var paddingLeftElem = parseInt(($("#cuadroFinPartida").css("padding-left")).replace("px",""));
+
+	var posX = (windowWidth - widthElem)/2 - marginElem - borderElem - paddingLeftElem;
+	var posY = (windowHeight - heightElem)/2 - marginElem - borderElem - paddingTopElem;
+	var posXStr = (Math.floor(posX)).toString()+"px";
+	var posYStr = (Math.floor(posY)).toString()+"px";
+	$("#cuadroFinPartida").css("left", posXStr);
+	$("#cuadroFinPartida").css("top", posYStr);
+
+	$("#cartelFinPartida").css("color", "darkred");
+	document.getElementById("cartelFinPartida").innerHTML = "¡HAS sido expulsado de la partida!"
+	document.getElementById("jugadorFinPartida").innerHTML = "(Por estar inactivo 3 turnos)";
+	$("#jugadorFinPartida").css("visibility", "visible");
+
+	$("#pauseButton").css("visibility", "hidden");
+	$("#listaTurnos").css("visibility", "hidden");
+	$("#listaEventos").css("visibility","hidden");
+	$("#reloadButton").css("visibility","hidden");
+	$("#exitButton").css("visibility","hidden");
+	$("#cuadroFinPartida").css("display", "block");
+
+	Engine.varsToInit();
+	actualizar_partidas();
+});
 
 socket.on('terminarPartida', function(data){
+	console.log("socket.on->terminarPartida");
 	//Dibujamos organos por ultima vez
 	if (data.organosJugadoresCli != undefined){
 		for (var jugador in data.organosJugadoresCli){
@@ -938,7 +1044,7 @@ socket.on('terminarPartida', function(data){
 			organosJugadoresCli[jugador].corazon = data.organosJugadoresCli[jugador].corazon;
 			organosJugadoresCli[jugador].higado = data.organosJugadoresCli[jugador].higado
 			organosJugadoresCli[jugador].hueso = data.organosJugadoresCli[jugador].hueso;
-			organosJugadoresCli[jugador].organoComodin = data.organosJugadoresCli[jugador].organoComodin;
+			organosJugadoresCli[jugador].comodin = data.organosJugadoresCli[jugador].comodin;
 		}
 	}
 	cerrarAyudaCartas();
@@ -948,21 +1054,14 @@ socket.on('terminarPartida', function(data){
 	clearTimeout(countDownSTO);
 	clearTimeout(esperarMovSTO);
 
-	//console.log("Terminar Partida");
-	//console.log("Ganador: "+data.ganador);
-
+	//Representamos cuadro fin de partida
 	var widthElem = parseInt(($("#cuadroFinPartida").css("width")).replace("px",""));
 	var heightElem = parseInt(($("#cuadroFinPartida").css("height")).replace("px",""));
 	var marginElem = parseInt(($("#cuadroFinPartida").css("margin")).replace("px",""));
 	var borderElem = parseInt(($("#cuadroFinPartida").css("border-width")).replace("px",""));
 	var paddingTopElem = parseInt(($("#cuadroFinPartida").css("padding-top")).replace("px",""));
 	var paddingLeftElem = parseInt(($("#cuadroFinPartida").css("padding-left")).replace("px",""));
-	/**console.log("widthElem: "+widthElem);
-	console.log("heightElem: "+heightElem);
-	console.log("marginElem: "+marginElem);
-	console.log("borderElem: "+borderElem);
-	console.log("paddingTopElem: "+paddingTopElem);
-	console.log("paddingLeftElem: "+paddingLeftElem);**/
+
 	var posX = (windowWidth - widthElem)/2 - marginElem - borderElem - paddingLeftElem;
 	var posY = (windowHeight - heightElem)/2 - marginElem - borderElem - paddingTopElem;
 	var posXStr = (Math.floor(posX)).toString()+"px";
@@ -970,9 +1069,28 @@ socket.on('terminarPartida', function(data){
 	$("#cuadroFinPartida").css("left", posXStr);
 	$("#cuadroFinPartida").css("top", posYStr);
 
-	document.getElementById("jugadorFinPartida").innerHTML = data.ganador;
+	$("#cartelFinPartida").css("color", "darkslateblue");
+	if (usuario.indexOf(data.ganador) > -1) {
+		$("#jugadorFinPartida").css("visibility", "hidden");
+		document.getElementById("cartelFinPartida").innerHTML = "¡HAS GANADO!";
+	} else {
+		document.getElementById("cartelFinPartida").innerHTML = "Ha ganado el jugador";
+		$("#jugadorFinPartida").css("visibility", "visible");
+		document.getElementById("jugadorFinPartida").innerHTML = data.ganador;
+
+	}
+
 	$("#pauseButton").css("visibility", "hidden");
+	$("#listaTurnos").css("visibility", "hidden");
+	$("#listaEventos").css("visibility","hidden");
+	$("#reloadButton").css("visibility","hidden");
+	$("#exitButton").css("visibility","hidden");
 	$("#cuadroFinPartida").css("display", "block");
+
+
+	//Pendiene dejar a null variables globales
+	idPartida = "";
+	infoJugadores = null;
 })
 /** -------------------- **/
 
