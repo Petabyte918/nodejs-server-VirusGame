@@ -193,8 +193,6 @@ function getUsersSorted (optionRanquing, data) {
 
 function abrirAyudaCartas (numCarta) {
 	//console.log("abrirAyudaCartas()");	
-	//Antes de abrir nuevas cerramos las ya abiertas
-	cerrarAyudaCartas();
 
 	//Si estamos realizando un descarte no abrimos otras ayudas - Muy hacky
 	if (numCarta == "ayudaDescartes") {
@@ -482,6 +480,47 @@ Engine = new function() {
 			posComodin: posComodin
 		};
 	}
+	this.initPosCartasUsuario = function(){
+		//console.log("Engine.initPosCartasUsuario()");
+		//1536px width //console.log("windowWidth: "+windowWidth);
+		//1013px height //console.log("windowHeight: "+windowHeight);
+
+		if (windowWidth/windowHeight < 1.6) {
+			var widthCarta = ((windowWidth/3)/4);
+			var heightCarta = widthCarta * (1536/1013);
+		} else {
+			var posYUsername = posOrganosJugadores[1].posCerebro[1] - 20;
+			var posUser = ((windowHeight/3)*2);
+			var heightCarta = posYUsername - posUser;
+			var widthCarta = heightCarta * (1013/1536);
+		}
+
+		var sepEntreCartas = 8; //max = widthCarta/4
+
+		//Debajo del mazo de descartes
+		//Aprovechamos que los descartes no ocupan toda su altura y comenzamos desde ahí
+		//var posYDeck = Math.floor(windowHeight/3); //De DeckOfCards.initDeckOfCards();
+		//var widthDeck = Math.floor((windowWidth/3)/3); //De DeckOfCards.initDeckOfCards();
+		//var heightDeck = Math.floor(widthDeck*210/148); //De DeckOfCards.initDeckOfCards();
+		//var posY = posYDeck + heightDeck + sepEntreCartas;
+
+		//Justo encima del nombre de jugador
+		var posY = posOrganosJugadores[1].posCerebro[1] - 40 - heightCarta;
+
+		var posCarta1 = {x: windowWidth/2 - widthCarta*1.5 - sepEntreCartas, 
+						 y: posY};
+		var posCarta2 = {x: windowWidth/2 - widthCarta*0.5,
+						 y: posY};
+		var posCarta3 = {x: windowWidth/2 + widthCarta*0.5 + sepEntreCartas,
+						 y: posY};
+
+		posCartasUsuario = {width: widthCarta, 
+							height: heightCarta,
+							carta1: posCarta1,
+							carta2: posCarta2,
+							carta3: posCarta3};
+
+	}
 	this.initPosPlayersHandCards = function() {
 		//1536px width //console.log("windowWidth: "+windowWidth);
 		//1013px height //console.log("windowHeight: "+windowHeight);
@@ -511,7 +550,20 @@ Engine = new function() {
 		posPlayersHandCards.imgSrc = imgSrc;
 
 		//Posicion 1
-		posPlayersHandCards[1] = null;
+		posicion1 = null;
+		/**
+		//Necesario poner posPlayersHandCards.width/height como variable por posicion, no para todos
+		posCarta1 = {x: posCartasUsuario.carta1.x,
+				  y: posCartasUsuario.carta1.y}
+		posCarta2 = {x: posCartasUsuario.carta2.x,
+				  y: posCartasUsuario.carta2.y}
+		posCarta3 = {x: posCartasUsuario.carta3.x,
+				  y: posCartasUsuario.carta3.y}
+
+		posPlayersHandCards[1] = {carta1: posCarta1,
+								  carta2: posCarta2,
+								  carta3: posCarta3};
+		**/
 
 		//Posicion 2
 		posX = posOrganosJugadores[2].posCerebro[0] + posOrganosJugadores[2].widthOrgano + sepDesdeOrganos*2;
@@ -567,47 +619,6 @@ Engine = new function() {
 		posPlayersHandCards[5] = {carta1: posCarta1,
 								  carta2: posCarta2,
 								  carta3: posCarta3};	
-	}
-	this.initPosCartasUsuario = function(){
-		//console.log("Engine.initPosCartasUsuario()");
-		//1536px width //console.log("windowWidth: "+windowWidth);
-		//1013px height //console.log("windowHeight: "+windowHeight);
-
-		if (windowWidth/windowHeight < 1.6) {
-			var widthCarta = ((windowWidth/3)/4);
-			var heightCarta = widthCarta * (1536/1013);
-		} else {
-			var posYUsername = posOrganosJugadores[1].posCerebro[1] - 20;
-			var posUser = ((windowHeight/3)*2);
-			var heightCarta = posYUsername - posUser;
-			var widthCarta = heightCarta * (1013/1536);
-		}
-
-		var sepEntreCartas = 8; //max = widthCarta/4
-
-		//Debajo del mazo de descartes
-		//Aprovechamos que los descartes no ocupan toda su altura y comenzamos desde ahí
-		//var posYDeck = Math.floor(windowHeight/3); //De DeckOfCards.initDeckOfCards();
-		//var widthDeck = Math.floor((windowWidth/3)/3); //De DeckOfCards.initDeckOfCards();
-		//var heightDeck = Math.floor(widthDeck*210/148); //De DeckOfCards.initDeckOfCards();
-		//var posY = posYDeck + heightDeck + sepEntreCartas;
-
-		//Justo encima del nombre de jugador
-		var posY = posOrganosJugadores[1].posCerebro[1] - 40 - heightCarta;
-
-		var posCarta1 = {x: windowWidth/2 - widthCarta*1.5 - sepEntreCartas, 
-						 y: posY};
-		var posCarta2 = {x: windowWidth/2 - widthCarta*0.5,
-						 y: posY};
-		var posCarta3 = {x: windowWidth/2 + widthCarta*0.5 + sepEntreCartas,
-						 y: posY};
-
-		posCartasUsuario = {width: widthCarta, 
-							height: heightCarta,
-							carta1: posCarta1,
-							carta2: posCarta2,
-							carta3: posCarta3};
-
 	}
 	this.initFinDescartesButton = function() {
 		var elemDescartesButton = document.getElementById("descartes_boton");

@@ -255,9 +255,11 @@ a.num_jugadores {
 }
 
 #cuadroFinPartida {
-	width: 80%;
-    height: 70%;
+    width: 50%;
+    height: 45%;
     position: absolute;
+    left: 20%;
+    top: 20%;
     border: solid 10px rgb(0, 77, 0);
 
     background-color: #2dc234;
@@ -275,7 +277,7 @@ a.num_jugadores {
     color: #fff;
     display: block;
     font-family: 'Oleo Script', Arial, sans-serif;
-    font-size: 30px;
+    font-size: 20px;
     line-height: 1;
     padding: 15px 25px;
     text-align: center;
@@ -291,8 +293,47 @@ a.num_jugadores {
 }
 
 #botonFinPartida {
-	width: 60%;
-    height: 20%;
+	background-color: #2dc234;
+
+	background-image: -webkit-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+	background-image: -moz-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+	background-image: -o-linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+	background-image: linear-gradient(rgba(41, 150, 47, .8), rgba(45, 194, 52, .2));
+
+	-ms-border-radius:8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+
+	-webkit-box-shadow: 0 8px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+	-moz-box-shadow: 0 8px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+	box-shadow: 0 8px 0 #197b1d, 0 10px 20px rgba(0, 0, 0, .4);
+
+	color: #fff;
+	font-family: 'Oleo Script', Arial, sans-serif;
+	line-height: 1;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: 0 -1px 1px rgba(25, 123, 29, .7);
+	margin: 1.2em;
+	display: inline;
+
+    position: absolute;
+    width: 60%;
+    height: 50px;
+    bottom: 0%;
+    left: 20%;
+    font-size: 20px;
+}
+
+#botonFinPartida:active {
+	/* Disminiumos la cantidad de sombras */
+	-webkit-box-shadow: 0 5px 0 #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
+	-moz-box-shadow: 0 5px 0 #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
+	box-shadow: 0 5px 0 #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
+
+    position: absolute;
+    margin: 1em;
 }
 
 input.boton {
@@ -947,7 +988,7 @@ p.textoEnumInstrucciones {
 
 	background-repeat: no-repeat;
 	background-color: green;
-	background-image: url(img/pauseButton1.png);
+	background-image: url(img/continueButton.png);
 	background-size: cover;
 
 	-webkit-box-shadow: 2px 4px 1px 1px #197b1d, 0 5px 10px rgba(0, 0, 0, .4);
@@ -959,11 +1000,6 @@ p.textoEnumInstrucciones {
 #pauseButton:active {
 	height: 82px;
 	width: 82px;
-
-	background-repeat: no-repeat;
-	background-color: green;
-	background-image: url(img/pauseButton1.png);
-	background-size: cover;
 
 	-webkit-box-shadow: 0px 0px 0px 0px #197b1d, 0px 0px 0px 6px rgba(0, 0, 0, 0.9);
     -moz-box-shadow: 0px 0px 0px 0px #197b1d, 0px 0px 0px 6px rgba(0, 0, 0, 0.9);
@@ -1031,7 +1067,7 @@ p.textoEnumInstrucciones {
     position: absolute;
     max-width: 50%;
     top: 20%;
-    left: 21%;
+    left: 23%;
     z-index: 1000;
     margin: 16px;
     padding: 15px 25px;
@@ -1208,6 +1244,11 @@ p.textoEnumInstrucciones {
 
 p.textoListaTurnosActual {
 	background-color: rgba(178, 34, 34, 0.4); /** firebrick **/
+}
+
+a.usuarioListaEventos {
+	color: '#003321';
+	font-weight: bold;
 }
 
 

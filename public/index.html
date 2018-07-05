@@ -67,23 +67,27 @@
 	<div id="settingsForm" style="display: none;">
 		<form name="form_settings_user" onsubmit="return form_settings()"/>
 			<label class="label_form1 tittle_settings">Ajustes</label>
-			<label class="label_form1">Activar ayuda débil</label>
-			<label class="label_form1 switch">
-			  	<input type="checkbox" name="ayudaDebilName" checked>
-			  	<span class="slider round"></span>
-			</label>
-			<label class="label_form2">Ayuda a usar las cartas especiales. Se recomienda dejar activado</label>
-			<label class="label_form1">Activar ayuda fuerte</label>
-			<label class="label_form1 switch">
-			  	<input type="checkbox" name="ayudaFuerteName" checked>
-			  	<span class="slider round"></span>
-			</label>
-			<label class="label_form2">Da información, de menor relevancia, sobre otros aspectos del juego</label>
+
 			<label class="label_form1">Recordar jugador</label>
 			<label class="label_form1 switch">
 			  	<input type="checkbox" name="autoLoginName" checked>
 			  	<span class="slider round"></span>
 			</label>
+
+			<label class="label_form1">Mostrar eventos</label>
+			<label class="label_form1 switch">
+			  	<input type="checkbox" name="mostrarListaEventosName" checked>
+			  	<span class="slider round"></span>
+			</label>
+			<label class="label_form2">Activa la ventana de información de eventos en partida</label>
+
+			<label class="label_form1">Mostrar turnos</label>
+			<label class="label_form1 switch">
+			  	<input type="checkbox" name="mostrarListaTurnosName" checked>
+			  	<span class="slider round"></span>
+			</label>
+			<label class="label_form2">Activa la ventana de información de turnos en partida</label>
+
 			<input class="settingsInputs bigButton" type="submit" value="Guardar" readonly="readonly"/>
 		</form>
 	</div>
@@ -149,7 +153,7 @@
 		<h1>Fin de la Partida</h1>
 		<h2 id="cartelFinPartida">Ha ganado el jugador</br></h2>
 		<h3 id="jugadorFinPartida"></h3>
-		<input class="boton" id="botonFinPartida" value="VOLVER A LA PANTALLA PRINCIPAL" onclick="backTo_InitMenu()" readonly="readonly"/>
+		<input id="botonFinPartida" value="VOLVER A LA PANTALLA PRINCIPAL" onclick="backTo_InitMenu()" readonly="readonly"/>
 	</div>
 
 	<div id="ayudaErrorMedico" style="visibility: hidden";">

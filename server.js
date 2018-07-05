@@ -1103,7 +1103,7 @@ function initDeckOfCards(){
 		//deckOfCards.push(new card(cardType.tratamiento, 'contagio', 'img/cardImagesLQ/especiales/contagio.png'));
 	}
 	//Para seguir mejorando esta carta y hacer pruebas
-	for (var i = 0; i < 8; i++) {
+	for (var i = 0; i < 14; i++) {
 		//deckOfCards.push(new card(cardType.tratamiento, 'ladronDeOrganos', 'img/cardImagesLQ/especiales/ladronDeOrganos.png'));
 		//deckOfCards.push(new card(cardType.tratamiento, 'transplante', 'img/cardImagesLQ/especiales/transplante.png'));
 		//deckOfCards.push(new card(cardType.organo, 'comodin', 'img/cardImagesLQ/organos/orgaComodin.png'));

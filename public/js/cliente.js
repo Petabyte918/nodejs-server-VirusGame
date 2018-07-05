@@ -3,8 +3,6 @@
 var lista_partidas = {};
 var idPartidaEsperando = "";
 var enPartidaEsperando = false;
-var ayudaFuerte;
-var ayudaDebil;
 var logged = "false";
 var gamePaused = "false";
 /** Establecimiento de la conexion con el servidor **/
@@ -30,7 +28,7 @@ function configInicial() {
 	if (autoLogin == "") {
 		document.form_settings_user.autoLoginName.checked = true;
 		//console.log("AutoLogin no guardado");
-		localStorage.setItem('autologin', "true");
+		autoLogin = "true";
 	} else if (autoLogin == "true") {
 		document.form_settings_user.autoLoginName.checked = true;
 		var loginName = localStorage.getItem('loginName');
@@ -43,34 +41,31 @@ function configInicial() {
 	} else {
 		document.form_settings_user.autoLoginName.checked = false;
 	}
+	localStorage.setItem('autoLogin', autoLogin);
 
-	ayudaDebil = localStorage.getItem('ayudaDebil');
-	if (ayudaDebil == "") {
-		document.form_settings_user.ayudaDebilName.checked = true;
-		//console.log("Ayuda debil no guardada");
-		localStorage.setItem('ayudaDebil', 'true');
-		ayudaDebil = true;
-	} else if (ayudaDebil == "true") {
-		document.form_settings_user.ayudaDebilName.checked = true;
-		ayudaDebil = true;
-	} else if (ayudaDebil == "false") {
-		document.form_settings_user.ayudaDebilName.checked = false;
-		ayudaDebil == false;
+	var mostrarListaEventos = localStorage.getItem('mostrarListaEventos');
+	if (mostrarListaEventos == "") {
+		document.form_settings_user.mostrarListaEventosName.checked = true;
+		//console.log("Mostrar lista eventos no guardado");
+		mostrarListaEventos = "true";
+	} else if (mostrarListaEventos == "true") {
+		document.form_settings_user.mostrarListaEventosName.checked = true;
+	} else if (mostrarListaEventos == "false") {
+		document.form_settings_user.mostrarListaEventosName.checked = false;
 	}
+	localStorage.setItem('mostrarListaEventos', mostrarListaEventos);
 
-	ayudaFuerte = localStorage.getItem('ayudaFuerte');
-	if (ayudaFuerte == "") {
-		document.form_settings_user.ayudaFuerteName.checked = true;
-		//console.log("Ayuda fuerte no guardada");
-		localStorage.setItem('ayudaFuerte', 'true');
-		ayudaFuerte = true;
-	} else if (ayudaFuerte == "true") {
-		document.form_settings_user.ayudaFuerteName.checked = true;
-		ayudaFuerte = true;
-	} else if (ayudaFuerte == "false") {
-		document.form_settings_user.ayudaFuerteName.checked = false;
-		ayudaFuerte == false;
+	var mostrarListaTurnos = localStorage.getItem('mostrarListaTurnos');
+	if (mostrarListaTurnos == "") {
+		document.form_settings_user.mostrarListaTurnosName.checked = true;
+		//console.log("Mostrar lista turnos no guardadao);
+		mostrarListaTurnos = "true";
+	} else if (mostrarListaTurnos == "true") {
+		document.form_settings_user.mostrarListaTurnosName.checked = true;
+	} else if (mostrarListaTurnos == "false") {
+		document.form_settings_user.mostrarListaTurnosName.checked = false;
 	}
+	localStorage.setItem('mostrarListaTurnos', mostrarListaTurnos);
 
 	//Posicion Cuadros ayuda
 	reDimPartidaRapida();	
@@ -401,12 +396,12 @@ function mostrarInstrucciones(pagina) {
 
 function form_settings() {
 	//console.log("form_settings()");
-	ayudaDebil = document.form_settings_user.ayudaDebilName.checked;
-	localStorage.setItem('ayudaDebil', ayudaDebil);
-	//console.log("Ayuda Debil: "+ayudaDebil);
-	ayudaFuerte = document.form_settings_user.ayudaFuerteName.checked;
-	localStorage.setItem('ayudaFuerte', ayudaFuerte);
-	//console.log("Ayuda Fuerte: "+ayudaFuerte);
+	var mostrarListaEventos = document.form_settings_user.mostrarListaEventosName.checked;
+	localStorage.setItem('mostrarListaEventos', mostrarListaEventos);
+	//console.log("Mostrar lista eventos: "+mostrarListaEventos);
+	var mostrarListaTurnos = document.form_settings_user.mostrarListaTurnosName.checked;
+	localStorage.setItem('mostrarListaTurnos', mostrarListaTurnos);
+	//console.log("Mostrar lista turnos: "+mostrarListaTurnos);
 	var autoLogin = document.form_settings_user.autoLoginName.checked;
 	localStorage.setItem('autoLogin', autoLogin);
 	//console.log("Autologin: "+autoLogin);
@@ -679,8 +674,8 @@ socket.on('prepararPartida', function(datos_iniciales){
 	Engine.initCanvas();
 	Engine.initJugadores();
 	Engine.initPosOrganosJugadores();
-	Engine.initPosPlayersHandCards();
 	Engine.initPosCartasUsuario();
+	Engine.initPosPlayersHandCards();
 	Engine.initFinDescartesButton();
 	Engine.initPauseButton();
 
@@ -908,6 +903,7 @@ socket.on('pauseGame', function(datos_partida) {
 	gamePaused = "true";
 	//Cambiamos color
 	$("#pauseButton").css("background-color","red");
+	$("#pauseButton").css("background-image","url(css/img/pauseButton.png)");
 	clearTimeout(countDownSTO); //->setTimeOut
 	clearTimeout(esperarMovSTO); //->setTimeOut
 });
@@ -917,6 +913,7 @@ socket.on('contineGame', function(datos_partida) {
 	gamePaused = "false";
 	//Cambiamos color
 	$("#pauseButton").css("background-color","green");
+	$("#pauseButton").css("background-image","url(css/img/continueButton.png)");
 	esperarMovimiento(); //->setTimeOut
 	renderCountDown(30, new Date()); //->setTimeOut
 });
