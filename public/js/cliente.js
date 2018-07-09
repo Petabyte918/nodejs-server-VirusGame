@@ -299,10 +299,14 @@ function form_register() {
 		document.getElementById("registerCorrection").innerHTML = "Las contraseñas no coinciden";
 		document.form_register_user.registerPass1.value = "";
 		document.form_register_user.registerPass2.value = "";
+		//Ocultamos el loading
+		$("#container_loading").css("visibility","hidden");
 	} else if (registerName != "") {
 		socket.emit('register_user', {usuario: registerName, pass: registerPass1});
 	} else {
 		//console.log('Usuario == ""');
+		//Ocultamos el loading
+		$("#container_loading").css("visibility","hidden");
 	}
 
 	return false;
@@ -426,11 +430,17 @@ socket.on('create_ranquing', function(data) {
 	$(".ranquingElems").remove();
 
 	var optionRanquing = localStorage.getItem('optionRanquing');
-	//console.log("optionRanquing: "+ optionRanquing);
 
 	var sortedObj = getUsersSorted(optionRanquing, data);
 	var maxLoop = (Object.keys(sortedObj)).length;
 
+	console.log("maxOfLoops: "+maxOfLoops);
+	if (maxOfLoops < maxLoop) {
+		maxLoop = maxOfLoops;
+	}
+
+	//Eliminamos el elemento test
+	$(".ranquingElems").remove();
 
 	var html = "";
 	for (var i = 0; i < maxLoop; i++) {
@@ -825,7 +835,7 @@ socket.on('siguienteTurnoCli', function(datos_partida){
 
 	//Guante de Latex
 	//El jugador de la carta no se descarta
-	if ((movJugador.tipoMov == "guanteDeLatex") && (usuario != turno)) {
+	if ((movJugador.tipoMov == "guanteDeLatex") && (usuario != movJugador.jugOrigen)) {
 		objetos[0].src = "";
 		objetos[1].src = "";
 		objetos[2].src = "";
@@ -1067,7 +1077,9 @@ socket.on('terminarPartida', function(data){
 	$("#cuadroFinPartida").css("top", posYStr);
 
 	$("#cartelFinPartida").css("color", "darkslateblue");
-	if (usuario.indexOf(data.ganador) > -1) {
+	console.log("usuario: "+usuario);
+	console.log("data.ganador: "+data.ganador);
+	if (infoJugadores[usuario].nombre.indexOf(data.ganador) > -1) {
 		$("#jugadorFinPartida").css("visibility", "hidden");
 		document.getElementById("cartelFinPartida").innerHTML = "¡HAS GANADO!";
 	} else {

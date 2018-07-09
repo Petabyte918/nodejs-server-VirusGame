@@ -24,6 +24,7 @@ var countDownSTO;
 var esperarMovSTO;
 var idDoneResizing;
 var reDimCanvasON = true;
+var maxOfLoops = 0;
 
 function actualizarCanvasBG(){
 
@@ -2184,6 +2185,17 @@ function reDimRanquingList() {
 		//console.log("Bien");
 		$("#ranquingList").css("width", widthRanquingListStr);
 	}
+
+	//Cogemos altura del elemento test
+	var elemRanquingCabElem= document.getElementById('ranquingCabElem');
+	var posRanquingCabElem = elemRanquingCabElem.getBoundingClientRect();
+	//Cogemos altura del contenedor
+	var elemRanquingList = document.getElementById('ranquingList');
+	var posRanquingList = elemRanquingList.getBoundingClientRect();
+	//Vemos el numero maximo de elementos que se pueden meter
+	console.log("ranquingList: "+posRanquingList.height);
+	console.log('ranquingIndices: '+posRanquingCabElem.height);
+	maxOfLoops = (posRanquingList.height / posRanquingCabElem.height) - 2;
 }
 
 function maximizeListaEventos() {

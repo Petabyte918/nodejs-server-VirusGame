@@ -517,6 +517,7 @@ input.botonCrearPartida {
 #ranquingList {
 	height: 80%;
 	z-index: 12;
+	overflow: hidden;
 }
 
 #settingsForm {
